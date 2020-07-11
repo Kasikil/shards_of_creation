@@ -13,7 +13,7 @@ try:
     import sys
     import random
     import math
-    import os
+    from os import path
     import getopt
     import pygame
     from sprites import *
@@ -44,7 +44,12 @@ class Game():
         self.load_data()
 
     def load_data(self):
-        pass
+        game_folder = path.dirname(__file__)
+        assets_folder = path.join(game_folder, 'assets')
+        self.map_data = []
+        with open(path.join(assets_folder, 'map.txt')) as map_file:
+            for line in map_file:
+                self.map_data.append(line)
 
     def new(self):
         """
@@ -52,9 +57,12 @@ class Game():
         """
         self.all_sprites = pygame.sprite.Group()
         self.walls = pygame.sprite.Group()
-        self.player = Player(self, 0, 0)
-        for x in range(10, 20):
-            Wall(self, x, 5)
+        for row, tiles in enumerate(self.map_data):
+            for col, tile in enumerate(tiles):
+                if tile == '1':
+                    Wall(self, col, row)
+                if tile == 'P':
+                    self.player = Player(self, col, row)
 
     def run(self):
         self.playing = True
