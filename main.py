@@ -102,6 +102,7 @@ class Game():
         self.draw_grid()
         for sprite in self.all_sprites:
             self.screen.blit(sprite.image, self.camera.apply(sprite))
+        pygame.draw.rect(self.screen, WHITE, self.player.hit_rect, 2)
         # Always last in drawing "flip"
         pygame.display.flip()
 

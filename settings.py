@@ -8,6 +8,13 @@
 #
 ####################################################################
 
+try:
+    # Standard Python Imports
+    import pygame
+except ImportError as err:
+    print ('Couldn\'t load module. {}'.format(err))
+    raise
+
 # Define Colors
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
@@ -30,5 +37,6 @@ GRIDHEIGHT = HEIGHT / TILESIZE
 
 # Player Settings
 PLAYER_SPEED = 300
-DIAGONAL_SPEED_MODIFIER = 0.7071 # Approximation of 1/sqrt(2)
-PLAYER_IMG = 'butterly.png'
+PLAYER_ROTATION_SPEED = 250 # degress/second
+PLAYER_IMG = 'elephant.png'
+PLAYER_HIT_RECT = pygame.Rect(0, 0, 35, 35)
