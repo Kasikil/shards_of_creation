@@ -9,9 +9,12 @@
 ####################################################################
 
 try:
-    import sys
+    # Standard Python Imports
     import os
     import pygame
+    import sys
+
+    # Non-Standard Imports
     from settings import *
 except ImportError as err:
     print ('Couldn\'t load module. {}'.format(err))

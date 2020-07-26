@@ -10,16 +10,20 @@
 VERSION = "0.1"
 
 try:
-    import sys
-    import random
+    # Standard Python Imports
+    import getopt
     import math
     from os import path
-    import getopt
-    import pygame
-    from sprites import *
-    from settings import *
-    from socket import *
+    import pygame    
     from pygame.locals import *
+    import random
+    from socket import *
+    import sys
+
+    # Non-Standard Imports
+    from settings import *
+    from sprites import *
+    from tilemap import *
 except ImportError as err:
     print ('Couldn\'t load module. {}'.format(err))
     sys.exit(2)
@@ -45,11 +49,9 @@ class Game():
 
     def load_data(self):
         game_folder = path.dirname(__file__)
-        assets_folder = path.join(game_folder, 'assets')
-        self.map_data = []
-        with open(path.join(assets_folder, 'map.txt')) as map_file:
-            for line in map_file:
-                self.map_data.append(line)
+        game_folder = path.join(game_folder, 'assets')
+        self.map = Map(path.join(game_folder, 'map2.txt'))
+
 
     def new(self):
         """
@@ -57,12 +59,13 @@ class Game():
         """
         self.all_sprites = pygame.sprite.Group()
         self.walls = pygame.sprite.Group()
-        for row, tiles in enumerate(self.map_data):
+        for row, tiles in enumerate(self.map.data):
             for col, tile in enumerate(tiles):
                 if tile == '1':
                     Wall(self, col, row)
                 if tile == 'P':
                     self.player = Player(self, col, row)
+        self.camera = Camera(self.map.width, self.map.height)
 
     def run(self):
         self.playing = True
@@ -81,6 +84,7 @@ class Game():
         Update portion of the game loop
         """
         self.all_sprites.update()
+        self.camera.update(self.player)
 
     def draw_grid(self):
         for x in range(0, WIDTH, TILESIZE):
@@ -94,7 +98,8 @@ class Game():
         """
         self.screen.fill(BGCOLOR)
         self.draw_grid()
-        self.all_sprites.draw(self.screen)
+        for sprite in self.all_sprites:
+            self.screen.blit(sprite.image, self.camera.apply(sprite))
         # Always last in drawing "flip"
         pygame.display.flip()
 
