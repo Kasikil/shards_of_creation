@@ -1,0 +1,1 @@
+This is a game! What will it do? Well, you will be able to explore a world! And there will be stuff to do! And there will be interactions to do! And there will be mortals, and immortals, and stories, and people, and animals, and monsters, and beasts, and more! Magic will be there! And weird physics maybe? Who know! Cool stuff is coming from these shards of creation!
