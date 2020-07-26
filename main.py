@@ -49,8 +49,10 @@ class Game():
 
     def load_data(self):
         game_folder = path.dirname(__file__)
+        img_folder = path.join(game_folder, 'img')
         game_folder = path.join(game_folder, 'assets')
         self.map = Map(path.join(game_folder, 'map2.txt'))
+        self.player_img = pygame.image.load(path.join(img_folder, PLAYER_IMG)).convert_alpha()
 
 
     def new(self):

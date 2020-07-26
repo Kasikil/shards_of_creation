@@ -20,6 +20,8 @@ except ImportError as err:
     print ('Couldn\'t load module. {}'.format(err))
     raise
 
+vector = pygame.math.Vector2
+
 # Set up assests folders
 game_folder = os.path.dirname(__file__)
 img_folder = os.path.join(game_folder, "img")
@@ -32,55 +34,51 @@ class Player(pygame.sprite.Sprite):
         self.groups = game.all_sprites
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.game = game
-        self.image = pygame.Surface((TILESIZE, TILESIZE))
-        self.image.fill(YELLOW)
+        self.image = game.player_img
         self.rect = self.image.get_rect()
-        self.vx, self.vy = 0, 0
-        self.x = x * TILESIZE
-        self.y = y * TILESIZE
+        self.velocity = vector(0, 0)
+        self.position = vector(x, y) * TILESIZE
 
     def get_keys(self):
-        self.vx, self.vy = 0, 0
+        self.velocity = vector(0, 0)
         keys = pygame.key.get_pressed()
         if keys[pygame.K_LEFT] or keys[pygame.K_a]:
-            self.vx = -PLAYER_SPEED
+            self.velocity.x = -PLAYER_SPEED
         if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
-            self.vx = PLAYER_SPEED
+            self.velocity.x = PLAYER_SPEED
         if keys[pygame.K_UP] or keys[pygame.K_w]:
-            self.vy = -PLAYER_SPEED
+            self.velocity.y = -PLAYER_SPEED
         if keys[pygame.K_DOWN] or keys[pygame.K_s]:
-            self.vy = PLAYER_SPEED
-        if self.vx !=0 and self.vy !=0:
-            self.vx *= DIAGONAL_SPEED_MODIFIER
-            self.vy *= DIAGONAL_SPEED_MODIFIER
+            self.velocity.y = PLAYER_SPEED
+        if self.velocity.x !=0 and self.velocity.y !=0:
+            self.velocity *= DIAGONAL_SPEED_MODIFIER
 
     def collide_with_walls(self, dir):
         if dir == 'x':
             hits = pygame.sprite.spritecollide(self, self.game.walls, False)
             if hits:
-                if self.vx > 0:
-                    self.x = hits[0].rect.left - self.rect.width
-                if self.vx < 0:
-                    self.x = hits[0].rect.right
-                self.vx = 0
-                self.rect.x = self.x
+                if self.velocity.x > 0:
+                    self.position.x = hits[0].rect.left - self.rect.width
+                if self.velocity.x < 0:
+                    self.position.x = hits[0].rect.right
+                self.velocity.x = 0
+                self.rect.x = self.position.x
         if dir == 'y':
             hits = pygame.sprite.spritecollide(self, self.game.walls, False)
             if hits:
-                if self.vy > 0:
-                    self.y = hits[0].rect.top - self.rect.height
-                if self.vy < 0:
-                    self.y = hits[0].rect.bottom
-                self.vy = 0
-                self.rect.y = self.y
+                if self.velocity.y > 0:
+                    self.position.y = hits[0].rect.top - self.rect.height
+                if self.velocity.y < 0:
+                    self.position.y = hits[0].rect.bottom
+                self.velocity.y = 0
+                self.rect.y = self.position.y
 
     def update(self):
         self.get_keys()
-        self.x += self.vx * self.game.dt
-        self.y += self.vy * self.game.dt
-        self.rect.x = self.x
+        self.position += self.velocity * self.game.dt
+        self.rect.x = self.position.x
         self.collide_with_walls('x')
-        self.rect.y = self.y
+        self.rect.y = self.position.y
         self.collide_with_walls('y')
 
 
