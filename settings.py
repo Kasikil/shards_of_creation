@@ -44,10 +44,11 @@ WALL_IMG = 'stone2_gray3.png'
 
 # Mob Settings
 MOB_IMG = 'maurice_flip.png'
-
+MOB_SPEED = 150
+MOB_HIT_RECT = pygame.Rect(0, 0, 35, 35)
 
 # Player Settings
 PLAYER_SPEED = 300
 PLAYER_ROTATION_SPEED = 250 # degress/second
 PLAYER_IMG = 'elephant.png'
-PLAYER_HIT_RECT = pygame.Rect(0, 0, 35, 35)
+PLAYER_HIT_RECT = pygame.Rect(0, 0, 30, 30)

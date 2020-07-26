@@ -23,6 +23,26 @@ except ImportError as err:
 
 vector = pygame.math.Vector2
 
+def collide_with_walls(sprite, group, dir):
+    if dir == 'x':
+        hits = pygame.sprite.spritecollide(sprite, group, False, collide_hit_rect)
+        if hits:
+            if sprite.velocity.x > 0:
+                sprite.position.x = hits[0].rect.left - sprite.hit_rect.width / 2
+            if sprite.velocity.x < 0:
+                sprite.position.x = hits[0].rect.right + sprite.hit_rect.width / 2
+            sprite.velocity.x = 0
+            sprite.hit_rect.centerx = sprite.position.x
+    if dir == 'y':
+        hits = pygame.sprite.spritecollide(sprite, group, False, collide_hit_rect)
+        if hits:
+            if sprite.velocity.y > 0:
+                sprite.position.y = hits[0].rect.top - sprite.hit_rect.height / 2
+            if sprite.velocity.y < 0:
+                sprite.position.y = hits[0].rect.bottom + sprite.hit_rect.height / 2
+            sprite.velocity.y = 0
+            sprite.hit_rect.centery = sprite.position.y
+
 # Set up assests folders
 game_folder = os.path.dirname(__file__)
 img_folder = os.path.join(game_folder, "img")
@@ -56,26 +76,6 @@ class Player(pygame.sprite.Sprite):
         if keys[pygame.K_DOWN] or keys[pygame.K_s]:
             self.velocity = vector(-PLAYER_SPEED / 2, 0).rotate(-self.rotation)
 
-    def collide_with_walls(self, dir):
-        if dir == 'x':
-            hits = pygame.sprite.spritecollide(self, self.game.walls, False, collide_hit_rect)
-            if hits:
-                if self.velocity.x > 0:
-                    self.position.x = hits[0].rect.left - self.hit_rect.width / 2
-                if self.velocity.x < 0:
-                    self.position.x = hits[0].rect.right + self.hit_rect.width / 2
-                self.velocity.x = 0
-                self.hit_rect.centerx = self.position.x
-        if dir == 'y':
-            hits = pygame.sprite.spritecollide(self, self.game.walls, False, collide_hit_rect)
-            if hits:
-                if self.velocity.y > 0:
-                    self.position.y = hits[0].rect.top - self.hit_rect.height / 2
-                if self.velocity.y < 0:
-                    self.position.y = hits[0].rect.bottom + self.hit_rect.height / 2
-                self.velocity.y = 0
-                self.hit_rect.centery = self.position.y
-
     def update(self):
         self.get_keys()
         self.rotation = (self.rotation + self.rotation_speed * self.game.dt) % 360
@@ -84,9 +84,9 @@ class Player(pygame.sprite.Sprite):
         self.rect.center = self.position
         self.position += self.velocity * self.game.dt
         self.hit_rect.centerx = self.position.x
-        self.collide_with_walls('x')
+        collide_with_walls(self, self.game.walls, 'x')
         self.hit_rect.centery = self.position.y
-        self.collide_with_walls('y')
+        collide_with_walls(self, self.game.walls, 'y')
         self.rect.center = self.hit_rect.center
 
 
@@ -97,14 +97,29 @@ class Mob(pygame.sprite.Sprite):
         self.game = game
         self.image = game.mob_img
         self.rect = self.image.get_rect()
+        self.hit_rect = MOB_HIT_RECT.copy()
+        self.hit_rect.center = self.rect.center
         self.position = vector(x, y) * TILESIZE
+        self.velocity = vector(0, 0)
+        self.acceleration = vector(0, 0)
         self.rect.center = self.position
         self.rotation = 0
 
     def update(self):
         self.rotation = (self.game.player.position - self.position).angle_to(vector(1, 0))
         self.image = pygame.transform.rotate(self.game.mob_img, self.rotation)
+        self.rect = self.image.get_rect()
         self.rect.center = self.position
+        self.acceleration = vector(MOB_SPEED, 0).rotate(-self.rotation)
+        self.acceleration += self.velocity * -1
+        self.velocity += self.acceleration * self.game.dt
+        self.position += self.velocity * self.game.dt * 0.5 + self.acceleration * self.game.dt ** 2
+        self.hit_rect.centerx = self.position.x
+        collide_with_walls(self, self.game.walls, 'x')
+        self.hit_rect.centery = self.position.y
+        collide_with_walls(self, self.game.walls, 'y')
+        self.rect.center = self.hit_rect.center
+
 
 
 class Wall(pygame.sprite.Sprite):
