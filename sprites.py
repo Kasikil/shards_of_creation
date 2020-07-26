@@ -90,13 +90,29 @@ class Player(pygame.sprite.Sprite):
         self.rect.center = self.hit_rect.center
 
 
+class Mob(pygame.sprite.Sprite):
+    def __init__(self, game, x, y):
+        self.groups = game.all_sprites, game.mobs
+        pygame.sprite.Sprite.__init__(self, self.groups)
+        self.game = game
+        self.image = game.mob_img
+        self.rect = self.image.get_rect()
+        self.position = vector(x, y) * TILESIZE
+        self.rect.center = self.position
+        self.rotation = 0
+
+    def update(self):
+        self.rotation = (self.game.player.position - self.position).angle_to(vector(1, 0))
+        self.image = pygame.transform.rotate(self.game.mob_img, self.rotation)
+        self.rect.center = self.position
+
+
 class Wall(pygame.sprite.Sprite):
     def __init__(self, game, x, y):
         self.groups = game.all_sprites, game.walls
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.game = game
-        self.image = pygame.Surface((TILESIZE, TILESIZE))
-        self.image.fill(GREEN)
+        self.image = game.wall_img
         self.rect = self.image.get_rect()
         self.x = x
         self.y = y

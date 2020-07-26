@@ -15,6 +15,9 @@ except ImportError as err:
     print ('Couldn\'t load module. {}'.format(err))
     raise
 
+# Debug Settings
+DEBUG = True
+
 # Define Colors
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
@@ -23,17 +26,25 @@ LIGHTGREY = (100, 100, 100)
 RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 YELLOW = (255, 255, 0)
+BROWN = (106, 55, 5)
 
 # Game Settings
 WIDTH = 1024 # 16 * 64 or 32 * 32 or 64 * 16
 HEIGHT = 512 # 16 * 32 or 32 * 16 or 64 * 8
 FPS = 60
 TITLE = 'Shards of Creation'
-BGCOLOR = DARKGREY
+BGCOLOR = BROWN
 
 TILESIZE = 32
 GRIDWIDTH = WIDTH / TILESIZE
 GRIDHEIGHT = HEIGHT / TILESIZE
+
+# Wall Settings
+WALL_IMG = 'stone2_gray3.png'
+
+# Mob Settings
+MOB_IMG = 'maurice_flip.png'
+
 
 # Player Settings
 PLAYER_SPEED = 300

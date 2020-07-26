@@ -53,7 +53,9 @@ class Game():
         game_folder = path.join(game_folder, 'assets')
         self.map = Map(path.join(game_folder, 'map2.txt'))
         self.player_img = pygame.image.load(path.join(img_folder, PLAYER_IMG)).convert_alpha()
-
+        self.mob_img = pygame.image.load(path.join(img_folder, MOB_IMG)).convert_alpha()
+        self.wall_img = pygame.image.load(path.join(img_folder, WALL_IMG)).convert_alpha()
+        self.wall_img = pygame.transform.scale(self.wall_img, (TILESIZE, TILESIZE))
 
     def new(self):
         """
@@ -61,10 +63,13 @@ class Game():
         """
         self.all_sprites = pygame.sprite.Group()
         self.walls = pygame.sprite.Group()
+        self.mobs = pygame.sprite.Group()
         for row, tiles in enumerate(self.map.data):
             for col, tile in enumerate(tiles):
                 if tile == '1':
                     Wall(self, col, row)
+                if tile == 'M':
+                    Mob(self, col, row)
                 if tile == 'P':
                     self.player = Player(self, col, row)
         self.camera = Camera(self.map.width, self.map.height)
@@ -98,11 +103,13 @@ class Game():
         """
         Draw portion of the game loop
         """
+        if DEBUG:
+            pygame.display.set_caption("{:.2f}".format(self.clock.get_fps()))
         self.screen.fill(BGCOLOR)
-        self.draw_grid()
+        # self.draw_grid()
         for sprite in self.all_sprites:
             self.screen.blit(sprite.image, self.camera.apply(sprite))
-        pygame.draw.rect(self.screen, WHITE, self.player.hit_rect, 2)
+        # pygame.draw.rect(self.screen, WHITE, self.player.hit_rect, 2)
         # Always last in drawing "flip"
         pygame.display.flip()
 
