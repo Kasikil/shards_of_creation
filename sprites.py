@@ -61,7 +61,7 @@ class Player(pygame.sprite.Sprite):
         self.hit_rect = PLAYER_HIT_RECT
         self.hit_rect.center = self.rect.center
         self.velocity = vector(0, 0)
-        self.position = vector(x, y) * TILESIZE
+        self.position = vector(x, y)
         self.rotation = 0
         self.last_shot = 0
         self.health = PLAYER_HEALTH
@@ -111,7 +111,7 @@ class Mob(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.hit_rect = MOB_HIT_RECT.copy()
         self.hit_rect.center = self.rect.center
-        self.position = vector(x, y) * TILESIZE
+        self.position = vector(x, y)
         self.velocity = vector(0, 0)
         self.acceleration = vector(0, 0)
         self.rect.center = self.position
@@ -157,6 +157,7 @@ class Projectile(pygame.sprite.Sprite):
         self.image = game.projectile_img
         self.image = pygame.transform.rotate(self.game.projectile_img, self.rotation)
         self.rect = self.image.get_rect()
+        self.hit_rect = self.rect
         self.position = vector(position)
         self.rect.center = position
         spread = uniform(-PROJECTILE_SPREAD, PROJECTILE_SPREAD)
@@ -172,14 +173,13 @@ class Projectile(pygame.sprite.Sprite):
             self.kill()
 
 
-class Wall(pygame.sprite.Sprite):
-    def __init__(self, game, x, y):
-        self.groups = game.all_sprites, game.walls
+class Obstacle(pygame.sprite.Sprite):
+    def __init__(self, game, x, y, width, height):
+        self.groups = game.walls
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.game = game
-        self.image = game.wall_img
-        self.rect = self.image.get_rect()
+        self.rect = pygame.Rect(x, y, width, height)
         self.x = x
         self.y = y
-        self.rect.x = x * TILESIZE
-        self.rect.y = y * TILESIZE
+        self.rect.x = x
+        self.rect.y = y

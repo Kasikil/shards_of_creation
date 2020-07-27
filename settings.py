@@ -29,6 +29,7 @@ RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 YELLOW = (255, 255, 0)
 BROWN = (106, 55, 5)
+CYAN = (0, 255, 255)
 
 # Game Settings
 WIDTH = 1024 # 16 * 64 or 32 * 32 or 64 * 16

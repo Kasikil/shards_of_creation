@@ -64,6 +64,7 @@ class Game():
         self.clock = pygame.time.Clock()
         pygame.key.set_repeat(500, 100)
         self.load_data()
+        self.draw_debug = False
 
     def load_data(self):
         game_folder = path.dirname(__file__)
@@ -87,15 +88,15 @@ class Game():
         self.mobs = pygame.sprite.Group()
         self.projectiles = pygame.sprite.Group()
         
-        # for row, tiles in enumerate(self.map.data):
-        #     for col, tile in enumerate(tiles):
-        #        if tile == '1':
-        #            Wall(self, col, row)
-        #        if tile == 'M':
-        #            Mob(self, col, row)
-        #        if tile == 'P':
-        #            self.player = Player(self, col, row)
-        self.player = Player(self, 5, 5)
+        for tile_object in self.map.tmxdata.objects:
+            if tile_object.name == 'player':
+                self.player = Player(self, tile_object.x, tile_object.y)
+            if tile_object.name == 'mob':
+                Mob(self, tile_object.x, tile_object.y)
+            if tile_object.name == 'wall':
+                Obstacle(self, tile_object.x, tile_object.y, 
+                tile_object.width, tile_object.height)
+
         self.camera = Camera(self.map.width, self.map.height)
 
     def run(self):
@@ -150,6 +151,12 @@ class Game():
             if isinstance(sprite, Mob):
                 sprite.draw_health()
             self.screen.blit(sprite.image, self.camera.apply(sprite))
+            if self.draw_debug:
+                pygame.draw.rect(self.screen, CYAN, self.camera.apply_rect(sprite.hit_rect), 1)
+        if self.draw_debug:
+            for wall in self.walls:
+                pygame.draw.rect(self.screen, CYAN, self.camera.apply_rect(wall.rect), 1)
+
         # pygame.draw.rect(self.screen, WHITE, self.player.hit_rect, 2)
         # Always last in drawing "flip"
         # HUD functions
@@ -164,6 +171,8 @@ class Game():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     self.quit()
+                if event.key == pygame.K_h and DEBUG:
+                    self.draw_debug = not self.draw_debug
 
     def show_start_screen(self):
         pass
