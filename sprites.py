@@ -12,6 +12,7 @@ try:
     # Standard Python Imports
     import os
     import pygame
+    import pytweening
     from random import choice, randint, uniform
     import sys
 
@@ -234,4 +235,17 @@ class Item(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.hit_rect = self.rect
         self.type = type
+        self.position = position
         self.rect.center = position
+        self.tween = pytweening.easeInOutSine
+        self.step = 0
+        self.direction = 1
+
+    def update(self):
+        # bobbing motion
+        offset = BOB_RANGE * (self.tween(self.step / BOB_RANGE) - 0.5) # -0.5 since we are starting in middle
+        self.rect.centery = self.position.y + offset * self.direction
+        self.step += BOB_SPEED
+        if self.step > BOB_RANGE:
+            self.step = 0
+            self.direction *= -1
