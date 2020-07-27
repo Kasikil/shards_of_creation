@@ -12,7 +12,7 @@ try:
     # Standard Python Imports
     import os
     import pygame
-    from random import uniform
+    from random import choice, uniform
     import sys
 
     # Non-Standard Imports
@@ -117,13 +117,24 @@ class Mob(pygame.sprite.Sprite):
         self.rect.center = self.position
         self.rotation = 0
         self.health = MOB_HEALTH
+        self.speed = choice(MOB_SPEEDS)
+
+
+    def avoid_mobs(self):
+        for mob in self.game.mobs:
+            if mob != self:
+                distance = self.position - mob.position
+                if 0 < distance.length() < AVOID_RADIUS:
+                    self.acceleration += distance.normalize()
 
     def update(self):
         self.rotation = (self.game.player.position - self.position).angle_to(vector(1, 0))
         self.image = pygame.transform.rotate(self.game.mob_img, self.rotation)
         self.rect = self.image.get_rect()
         self.rect.center = self.position
-        self.acceleration = vector(MOB_SPEED, 0).rotate(-self.rotation)
+        self.acceleration = vector(1, 0).rotate(-self.rotation)
+        self.avoid_mobs()
+        self.acceleration.scale_to_length(self.speed)
         self.acceleration += self.velocity * -1
         self.velocity += self.acceleration * self.game.dt
         self.position += self.velocity * self.game.dt * 0.5 + self.acceleration * self.game.dt ** 2

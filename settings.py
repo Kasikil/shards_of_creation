@@ -47,11 +47,12 @@ WALL_IMG = 'stone2_gray3.png'
 
 # Mob Settings
 MOB_IMG = 'maurice_flip.png'
-MOB_SPEED = 150
+MOB_SPEEDS = [150, 100, 75, 125]
 MOB_HIT_RECT = pygame.Rect(0, 0, 35, 35)
 MOB_HEALTH = 100
 MOB_DAMAGE = 10
 MOB_KNOCKBACK = 20
+AVOID_RADIUS = 50
 
 # Projectile Settings
 PROJECTILE_IMG = 'i-vampiricism.png'
