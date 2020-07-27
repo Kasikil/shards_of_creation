@@ -69,6 +69,8 @@ class Game():
     def load_data(self):
         game_folder = path.dirname(__file__)
         img_folder = path.join(game_folder, 'img')
+        sound_folder = path.join(game_folder, 'sound')
+        music_folder = path.join(game_folder, 'music')
         assets_folder = path.join(game_folder, 'assets')
         self.map = TiledMap(path.join(assets_folder, 'map.tmx'))
         self.map_img = self.map.make_map()
@@ -84,6 +86,27 @@ class Game():
         self.item_images = {}
         for item in ITEM_IMAGES:
             self.item_images[item] = pygame.image.load(path.join(img_folder, ITEM_IMAGES[item])).convert_alpha()
+
+        # Sound Loading
+        pygame.mixer.music.load(path.join(music_folder, BACKGROUND_MUSIC))
+        self.effect_sounds = {}
+        for type in EFFECTS_SOUNDS:
+            self.effect_sounds[type] = pygame.mixer.Sound(path.join(sound_folder, EFFECTS_SOUNDS[type]))
+        self.weapon_sounds = {}
+        self.weapon_sounds['vampirism'] = []
+        for sound in CASTING_SOUNDS_VAMPIRISM:
+            self.weapon_sounds['vampirism'].append(pygame.mixer.Sound(path.join(sound_folder, sound)))
+        self.mob_standard_sounds = []
+        for sound in MOB_STANDARD_SOUNDS:
+            s = pygame.mixer.Sound(path.join(sound_folder, sound))
+            s.set_volume(1) # Range of 1 - full original to 0 - mute
+            self.mob_standard_sounds.append(s)
+        self.player_hit_sounds = []
+        for sound in PLAYER_HIT_SOUNDS:
+            self.player_hit_sounds.append(pygame.mixer.Sound(path.join(sound_folder, sound)))
+        self.mob_hit_sounds = []
+        for sound in MOB_HIT_SOUNDS:
+            self.mob_hit_sounds.append(pygame.mixer.Sound(path.join(sound_folder, sound)))
 
     def new(self):
         """
@@ -108,9 +131,11 @@ class Game():
             if tile_object.name in ['health']:
                 Item(self, obj_center, tile_object.name)
         self.camera = Camera(self.map.width, self.map.height)
+        self.effect_sounds['level_start'].play()
 
     def run(self):
         self.playing = True
+        pygame.mixer.music.play(loops=-1)
         while self.playing:
             self.dt = self.clock.tick(FPS) / 1000
             self.events()
@@ -132,11 +157,14 @@ class Game():
         for hit in hits:
             if hit.type == 'health' and self.player.health < PLAYER_HEALTH:
                 hit.kill()
+                self.effect_sounds['health_up'].play()
                 self.player.add_health(HEALTH_PACK_AMOUNT)
 
         # mobs hits player
         hits = pygame.sprite.spritecollide(self.player, self.mobs, False, collide_hit_rect)
         for hit in hits:
+            if random() < 0.7:
+                choice(self.player_hit_sounds).play()
             self.player.health -= MOB_DAMAGE
             hit.velocity = vector(0, 0)
             if self.player.health <= 0:

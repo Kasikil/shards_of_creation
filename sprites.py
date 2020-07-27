@@ -13,7 +13,7 @@ try:
     import os
     import pygame
     import pytweening
-    from random import choice, randint, uniform
+    from random import choice, randint, random, uniform
     import sys
 
     # Non-Standard Imports
@@ -89,6 +89,7 @@ class Player(pygame.sprite.Sprite):
                 position = self.position + PROJECTILE_LAUNCH_OFFSET.rotate(-self.rotation)
                 Projectile(self.game, self.rotation, position, direction)
                 self.velocity += vector(-PROJECTILE_OOMF, 0).rotate(-self.rotation)
+                choice(self.game.weapon_sounds['vampirism']).play()
                 CastingFlash(self.game, position)
 
 
@@ -117,7 +118,7 @@ class Mob(pygame.sprite.Sprite):
         self.groups = game.all_sprites, game.mobs
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.game = game
-        self.image = game.mob_img
+        self.image = game.mob_img.copy()
         self.rect = self.image.get_rect()
         self.rect.center = (x, y)
         self.hit_rect = MOB_HIT_RECT.copy()
@@ -129,6 +130,7 @@ class Mob(pygame.sprite.Sprite):
         self.rotation = 0
         self.health = MOB_HEALTH
         self.speed = choice(MOB_SPEEDS)
+        self.target = game.player
 
 
     def avoid_mobs(self):
@@ -139,22 +141,27 @@ class Mob(pygame.sprite.Sprite):
                     self.acceleration += distance.normalize()
 
     def update(self):
-        self.rotation = (self.game.player.position - self.position).angle_to(vector(1, 0))
+        target_distance = (self.game.player.position - self.position)
+        if target_distance.length_squared() < DETECT_RADIUS**2: # Squared to optimize. Sqrt is slow
+            if random() < 0.002:
+                choice(self.game.mob_standard_sounds).play()
+            self.rotation = target_distance.angle_to(vector(1, 0))
+            self.rect = self.image.get_rect()
+            self.acceleration = vector(1, 0).rotate(-self.rotation)
+            self.avoid_mobs()
+            self.acceleration.scale_to_length(self.speed)
+            self.acceleration += self.velocity * -1
+            self.velocity += self.acceleration * self.game.dt
+            self.position += self.velocity * self.game.dt * 0.5 + self.acceleration * self.game.dt ** 2
+            self.hit_rect.centerx = self.position.x
+            collide_with_walls(self, self.game.walls, 'x')
+            self.hit_rect.centery = self.position.y
+            collide_with_walls(self, self.game.walls, 'y')
+            self.rect.center = self.hit_rect.center
         self.image = pygame.transform.rotate(self.game.mob_img, self.rotation)
-        self.rect = self.image.get_rect()
         self.rect.center = self.position
-        self.acceleration = vector(1, 0).rotate(-self.rotation)
-        self.avoid_mobs()
-        self.acceleration.scale_to_length(self.speed)
-        self.acceleration += self.velocity * -1
-        self.velocity += self.acceleration * self.game.dt
-        self.position += self.velocity * self.game.dt * 0.5 + self.acceleration * self.game.dt ** 2
-        self.hit_rect.centerx = self.position.x
-        collide_with_walls(self, self.game.walls, 'x')
-        self.hit_rect.centery = self.position.y
-        collide_with_walls(self, self.game.walls, 'y')
-        self.rect.center = self.hit_rect.center
         if self.health <= 0:
+            choice(self.game.mob_hit_sounds).play()
             self.kill()
 
     def draw_health(self):
@@ -217,6 +224,7 @@ class CastingFlash(pygame.sprite.Sprite):
         size = randint(20, 50)
         self.image = pygame.transform.scale(choice(game.casting_flashes), (size, size))
         self.rect = self.image.get_rect()
+        self.hit_rect = self.rect
         self.position = position
         self.rect.center = position
         self.spawn_time = pygame.time.get_ticks()

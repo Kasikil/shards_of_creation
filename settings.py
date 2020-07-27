@@ -53,6 +53,7 @@ MOB_HEALTH = 100
 MOB_DAMAGE = 10
 MOB_KNOCKBACK = 20
 AVOID_RADIUS = 50
+DETECT_RADIUS = 200
 
 # Projectile Settings
 PROJECTILE_IMG = 'i-vampiricism.png'
@@ -89,3 +90,11 @@ ITEM_IMAGES = {'health': 'health_potion.png'}
 HEALTH_PACK_AMOUNT = 20
 BOB_RANGE = 15
 BOB_SPEED = 0.4
+
+# Sounds
+BACKGROUND_MUSIC = 'Ketsa_-_08_-_Multiverse.mp3'
+PLAYER_HIT_SOUNDS = ['elephant.wav']
+MOB_STANDARD_SOUNDS = ['shade1.wav', 'shade2.wav', 'shade3.wav', 'shade4.wav', 'shade5.wav']
+MOB_HIT_SOUNDS = ['shade14.wav']
+CASTING_SOUNDS_VAMPIRISM = ['vampiristic_kiss.wav']
+EFFECTS_SOUNDS = {'level_start': 'spell.wav', 'health_up': 'bottle.wav'}
