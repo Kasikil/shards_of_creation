@@ -66,20 +66,47 @@ class Game():
         self.load_data()
         self.draw_debug = False
 
+    def draw_text(self, text, font_name, size, color, x, y, align="nw"):
+        font = pygame.font.Font(font_name, size)
+        text_surface = font.render(text, True, color)
+        text_rect = text_surface.get_rect()
+        if align == 'nw':
+            text_rect.topleft = (x, y)
+        if align == 'ne':
+            text_rect.topright = (x, y)
+        if align == 'sw':
+            text_rect.bottomleft = (x, y)
+        if align == 'se':
+            text_rect.bottomright = (x, y)
+        if align == 'n':
+            text_rect.midtop = (x, y)
+        if align == 's':
+            text_rect.midbottom = (x, y)
+        if align == 'e':
+            text_rect.midright = (x, y)
+        if align == 'w':
+            text_rect.midleft = (x, y)
+        if align == 'center':
+            text_rect.center = (x, y)
+        self.screen.blit(text_surface, text_rect)
+
     def load_data(self):
         game_folder = path.dirname(__file__)
         img_folder = path.join(game_folder, 'img')
         sound_folder = path.join(game_folder, 'sound')
         music_folder = path.join(game_folder, 'music')
         assets_folder = path.join(game_folder, 'assets')
+        self.title_font = path.join(assets_folder, 'ENDOR.TTF')
+        self.dim_screen = pygame.Surface(self.screen.get_size()).convert_alpha()
+        self.dim_screen.fill((0, 0, 0, 180))
         self.map = TiledMap(path.join(assets_folder, 'map.tmx'))
         self.map_img = self.map.make_map()
         self.map_rect = self.map_img.get_rect()
         self.player_img = pygame.image.load(path.join(img_folder, PLAYER_IMG)).convert_alpha()
         self.projectile_img = pygame.image.load(path.join(img_folder, PROJECTILE_IMG)).convert_alpha()
         self.mob_img = pygame.image.load(path.join(img_folder, MOB_IMG)).convert_alpha()
-        self.wall_img = pygame.image.load(path.join(img_folder, WALL_IMG)).convert_alpha()
-        self.wall_img = pygame.transform.scale(self.wall_img, (TILESIZE, TILESIZE))
+        self.splat = pygame.image.load(path.join(img_folder, MOB_SPLAT)).convert_alpha()
+        self.splat = pygame.transform.scale(self.splat, (TILESIZE, TILESIZE))
         self.casting_flashes = []
         for img in CASTING_FLASH:
             self.casting_flashes.append(pygame.image.load(path.join(img_folder, img)).convert_alpha())
@@ -131,6 +158,7 @@ class Game():
             if tile_object.name in ['health']:
                 Item(self, obj_center, tile_object.name)
         self.camera = Camera(self.map.width, self.map.height)
+        self.paused = False
         self.effect_sounds['level_start'].play()
 
     def run(self):
@@ -139,7 +167,8 @@ class Game():
         while self.playing:
             self.dt = self.clock.tick(FPS) / 1000
             self.events()
-            self.update()
+            if not self.paused:
+                self.update()
             self.draw()
 
     def quit(self):
@@ -206,6 +235,9 @@ class Game():
         # Always last in drawing "flip"
         # HUD functions
         draw_player_health(self.screen, 10, 10, self.player.health / PLAYER_HEALTH)
+        if self.paused:
+            self.screen.blit(self.dim_screen, (0, 0))
+            self.draw_text('Paused', self.title_font, 50, RED, WIDTH / 2, HEIGHT / 2, align='center')
         pygame.display.flip()
 
     def events(self):
@@ -218,6 +250,8 @@ class Game():
                     self.quit()
                 if event.key == pygame.K_h and DEBUG:
                     self.draw_debug = not self.draw_debug
+                if event.key == pygame.K_p:
+                    self.paused = not self.paused
 
     def show_start_screen(self):
         pass

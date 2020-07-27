@@ -163,6 +163,7 @@ class Mob(pygame.sprite.Sprite):
         if self.health <= 0:
             choice(self.game.mob_hit_sounds).play()
             self.kill()
+            self.game.map_img.blit(self.game.splat, self.position - vector(TILESIZE / 2, TILESIZE / 2))
 
     def draw_health(self):
         if self.health > MOB_HEALTH * 0.6:

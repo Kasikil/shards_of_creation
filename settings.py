@@ -42,11 +42,9 @@ TILESIZE = 32
 GRIDWIDTH = WIDTH / TILESIZE
 GRIDHEIGHT = HEIGHT / TILESIZE
 
-# Wall Settings
-WALL_IMG = 'stone2_gray3.png'
-
 # Mob Settings
 MOB_IMG = 'maurice_flip.png'
+MOB_SPLAT = 'shade_splat.png'
 MOB_SPEEDS = [150, 100, 75, 125]
 MOB_HIT_RECT = pygame.Rect(0, 0, 35, 35)
 MOB_HEALTH = 100
