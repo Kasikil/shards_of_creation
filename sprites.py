@@ -12,6 +12,7 @@ try:
     # Standard Python Imports
     import os
     import pygame
+    from random import uniform
     import sys
 
     # Non-Standard Imports
@@ -62,6 +63,7 @@ class Player(pygame.sprite.Sprite):
         self.velocity = vector(0, 0)
         self.position = vector(x, y) * TILESIZE
         self.rotation = 0
+        self.last_shot = 0
 
     def get_keys(self):
         self.rotation_speed = 0
@@ -75,6 +77,15 @@ class Player(pygame.sprite.Sprite):
             self.velocity = vector(PLAYER_SPEED, 0).rotate(-self.rotation)
         if keys[pygame.K_DOWN] or keys[pygame.K_s]:
             self.velocity = vector(-PLAYER_SPEED / 2, 0).rotate(-self.rotation)
+        if keys[pygame.K_SPACE]:
+            now = pygame.time.get_ticks()
+            if now - self.last_shot > PROJECTILE_RATE:
+                self.last_shot = now
+                direction = vector(1, 0).rotate(-self.rotation)
+                position = self.position + PROJECTILE_LAUNCH_OFFSET.rotate(-self.rotation)
+                Projectile(self.game, self.rotation, position, direction)
+                self.velocity += vector(-PROJECTILE_OOMF, 0).rotate(-self.rotation)
+
 
     def update(self):
         self.get_keys()
@@ -120,6 +131,29 @@ class Mob(pygame.sprite.Sprite):
         collide_with_walls(self, self.game.walls, 'y')
         self.rect.center = self.hit_rect.center
 
+
+class Projectile(pygame.sprite.Sprite):
+    def __init__(self, game, rotation, position, direction):
+        self.groups = game.all_sprites, game.projectiles
+        pygame.sprite.Sprite.__init__(self, self.groups)
+        self.game = game
+        self.rotation = rotation
+        self.image = game.projectile_img
+        self.image = pygame.transform.rotate(self.game.projectile_img, self.rotation)
+        self.rect = self.image.get_rect()
+        self.position = vector(position)
+        self.rect.center = position
+        spread = uniform(-PROJECTILE_SPREAD, PROJECTILE_SPREAD)
+        self.velocity = direction.rotate(spread) * PROJECTILE_SPEED
+        self.spawn_time = pygame.time.get_ticks()
+
+    def update(self):
+        self.position += self.velocity * self.game.dt
+        self.rect.center = self.position
+        if pygame.sprite.spritecollideany(self, self.game.walls):
+            self.kill()
+        if pygame.time.get_ticks() - self.spawn_time > PROJECTILE_LIFETIME:
+            self.kill()
 
 
 class Wall(pygame.sprite.Sprite):

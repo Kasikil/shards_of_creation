@@ -15,6 +15,8 @@ except ImportError as err:
     print ('Couldn\'t load module. {}'.format(err))
     raise
 
+vector = pygame.math.Vector2
+
 # Debug Settings
 DEBUG = True
 
@@ -47,8 +49,17 @@ MOB_IMG = 'maurice_flip.png'
 MOB_SPEED = 150
 MOB_HIT_RECT = pygame.Rect(0, 0, 35, 35)
 
+# Projectile Settings
+PROJECTILE_IMG = 'i-vampiricism.png'
+PROJECTILE_SPEED = 500
+PROJECTILE_LIFETIME = 1000 # ms
+PROJECTILE_RATE = 150
+PROJECTILE_OOMF = 200
+PROJECTILE_SPREAD = 5
+
 # Player Settings
 PLAYER_SPEED = 300
 PLAYER_ROTATION_SPEED = 250 # degress/second
 PLAYER_IMG = 'elephant.png'
 PLAYER_HIT_RECT = pygame.Rect(0, 0, 30, 30)
+PROJECTILE_LAUNCH_OFFSET = vector(15, 5)
