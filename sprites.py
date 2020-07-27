@@ -104,6 +104,11 @@ class Player(pygame.sprite.Sprite):
         collide_with_walls(self, self.game.walls, 'y')
         self.rect.center = self.hit_rect.center
 
+    def add_health(self, amount):
+        self.health += amount
+        if self.health > PLAYER_HEALTH:
+            self.health = PLAYER_HEALTH
+
 
 class Mob(pygame.sprite.Sprite):
     def __init__(self, game, x, y):
@@ -219,3 +224,14 @@ class CastingFlash(pygame.sprite.Sprite):
         if pygame.time.get_ticks() - self.spawn_time > FLASH_DURATION:
             self.kill()
 
+class Item(pygame.sprite.Sprite):
+    def __init__(self, game, position, type):
+        self._layer = ITEMS_LAYER
+        self.groups = game.all_sprites, game.items
+        pygame.sprite.Sprite.__init__(self, self.groups)
+        self.game = game
+        self.image = self.game.item_images[type]
+        self.rect = self.image.get_rect()
+        self.hit_rect = self.rect
+        self.type = type
+        self.rect.center = position
