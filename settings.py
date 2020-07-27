@@ -48,6 +48,9 @@ WALL_IMG = 'stone2_gray3.png'
 MOB_IMG = 'maurice_flip.png'
 MOB_SPEED = 150
 MOB_HIT_RECT = pygame.Rect(0, 0, 35, 35)
+MOB_HEALTH = 100
+MOB_DAMAGE = 10
+MOB_KNOCKBACK = 20
 
 # Projectile Settings
 PROJECTILE_IMG = 'i-vampiricism.png'
@@ -56,8 +59,10 @@ PROJECTILE_LIFETIME = 1000 # ms
 PROJECTILE_RATE = 150
 PROJECTILE_OOMF = 200
 PROJECTILE_SPREAD = 5
+PROJECTILE_DAMAGE = 10
 
 # Player Settings
+PLAYER_HEALTH = 100
 PLAYER_SPEED = 300
 PLAYER_ROTATION_SPEED = 250 # degress/second
 PLAYER_IMG = 'elephant.png'

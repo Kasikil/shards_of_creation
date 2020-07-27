@@ -28,6 +28,24 @@ except ImportError as err:
     print ('Couldn\'t load module. {}'.format(err))
     sys.exit(2)
 
+# HUD Functions
+def draw_player_health(surface, x, y, percentage):
+    if percentage < 0:
+        percentage = 0
+    BAR_LENGTH = 100
+    BAR_HEIGHT = 20
+    fill = percentage * BAR_LENGTH
+    outline_rect = pygame.Rect(x, y, BAR_LENGTH, BAR_HEIGHT)
+    fill_rect = pygame.Rect(x, y, fill, BAR_HEIGHT)
+    if percentage > 0.6:
+        color = GREEN
+    elif percentage > 0.3:
+        color = YELLOW
+    else:
+        color = RED
+    pygame.draw.rect(surface, color, fill_rect)
+    pygame.draw.rect(surface, WHITE, outline_rect, 2)
+
 class Game():
     """
     This class is the main game loop as well as the 
@@ -94,10 +112,20 @@ class Game():
         """
         self.all_sprites.update()
         self.camera.update(self.player)
+        # mobs hi player
+        hits = pygame.sprite.spritecollide(self.player, self.mobs, False, collide_hit_rect)
+        for hit in hits:
+            self.player.health -= MOB_DAMAGE
+            hit.velocity = vector(0, 0)
+            if self.player.health <= 0:
+                self.playing = False
+        if hits:
+            self.player.position += vector(MOB_KNOCKBACK, 0).rotate(-hits[0].rotation)
         # projectiles hit mobs
         hits = pygame.sprite.groupcollide(self.mobs, self.projectiles, False, True)
         for hit in hits:
-            hit.kill()
+            hit.health -= PROJECTILE_DAMAGE
+            hit.velocity = vector(0, 0)
 
     def draw_grid(self):
         for x in range(0, WIDTH, TILESIZE):
@@ -114,9 +142,13 @@ class Game():
         self.screen.fill(BGCOLOR)
         # self.draw_grid()
         for sprite in self.all_sprites:
+            if isinstance(sprite, Mob):
+                sprite.draw_health()
             self.screen.blit(sprite.image, self.camera.apply(sprite))
         # pygame.draw.rect(self.screen, WHITE, self.player.hit_rect, 2)
         # Always last in drawing "flip"
+        # HUD functions
+        draw_player_health(self.screen, 10, 10, self.player.health / PLAYER_HEALTH)
         pygame.display.flip()
 
     def events(self):
