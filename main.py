@@ -78,12 +78,15 @@ class Game():
         self.mob_img = pygame.image.load(path.join(img_folder, MOB_IMG)).convert_alpha()
         self.wall_img = pygame.image.load(path.join(img_folder, WALL_IMG)).convert_alpha()
         self.wall_img = pygame.transform.scale(self.wall_img, (TILESIZE, TILESIZE))
+        self.casting_flashes = []
+        for img in CASTING_FLASH:
+            self.casting_flashes.append(pygame.image.load(path.join(img_folder, img)).convert_alpha())
 
     def new(self):
         """
         Initializes all variables and do all the setup for a new game
         """
-        self.all_sprites = pygame.sprite.Group()
+        self.all_sprites = pygame.sprite.LayeredUpdates()
         self.walls = pygame.sprite.Group()
         self.mobs = pygame.sprite.Group()
         self.projectiles = pygame.sprite.Group()

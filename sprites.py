@@ -12,7 +12,7 @@ try:
     # Standard Python Imports
     import os
     import pygame
-    from random import choice, uniform
+    from random import choice, randint, uniform
     import sys
 
     # Non-Standard Imports
@@ -53,11 +53,13 @@ class Player(pygame.sprite.Sprite):
     Sprite for the player character
     """
     def __init__(self, game, x, y):
+        self._layer = PLAYER_LAYER
         self.groups = game.all_sprites
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.game = game
         self.image = game.player_img
         self.rect = self.image.get_rect()
+        self.rect.center = (x, y)
         self.hit_rect = PLAYER_HIT_RECT
         self.hit_rect.center = self.rect.center
         self.velocity = vector(0, 0)
@@ -86,6 +88,7 @@ class Player(pygame.sprite.Sprite):
                 position = self.position + PROJECTILE_LAUNCH_OFFSET.rotate(-self.rotation)
                 Projectile(self.game, self.rotation, position, direction)
                 self.velocity += vector(-PROJECTILE_OOMF, 0).rotate(-self.rotation)
+                CastingFlash(self.game, position)
 
 
     def update(self):
@@ -104,11 +107,13 @@ class Player(pygame.sprite.Sprite):
 
 class Mob(pygame.sprite.Sprite):
     def __init__(self, game, x, y):
+        self._layer = MOB_LAYER
         self.groups = game.all_sprites, game.mobs
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.game = game
         self.image = game.mob_img
         self.rect = self.image.get_rect()
+        self.rect.center = (x, y)
         self.hit_rect = MOB_HIT_RECT.copy()
         self.hit_rect.center = self.rect.center
         self.position = vector(x, y)
@@ -161,6 +166,7 @@ class Mob(pygame.sprite.Sprite):
 
 class Projectile(pygame.sprite.Sprite):
     def __init__(self, game, rotation, position, direction):
+        self._layer = PROJECTILE_LAYER
         self.groups = game.all_sprites, game.projectiles
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.game = game
@@ -186,6 +192,7 @@ class Projectile(pygame.sprite.Sprite):
 
 class Obstacle(pygame.sprite.Sprite):
     def __init__(self, game, x, y, width, height):
+        self._layer = WALL_LAYER
         self.groups = game.walls
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.game = game
@@ -194,3 +201,21 @@ class Obstacle(pygame.sprite.Sprite):
         self.y = y
         self.rect.x = x
         self.rect.y = y
+
+class CastingFlash(pygame.sprite.Sprite):
+    def __init__(self, game, position):
+        self._layer = EFFECTS_LAYER
+        self.groups = game.all_sprites
+        pygame.sprite.Sprite.__init__(self, self.groups)
+        self.game = game
+        size = randint(20, 50)
+        self.image = pygame.transform.scale(choice(game.casting_flashes), (size, size))
+        self.rect = self.image.get_rect()
+        self.position = position
+        self.rect.center = position
+        self.spawn_time = pygame.time.get_ticks()
+
+    def update(self):
+        if pygame.time.get_ticks() - self.spawn_time > FLASH_DURATION:
+            self.kill()
+

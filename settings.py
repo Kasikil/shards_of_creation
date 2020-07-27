@@ -70,3 +70,15 @@ PLAYER_ROTATION_SPEED = 250 # degress/second
 PLAYER_IMG = 'elephant.png'
 PLAYER_HIT_RECT = pygame.Rect(0, 0, 30, 30)
 PROJECTILE_LAUNCH_OFFSET = vector(15, 5)
+
+# Effects
+CASTING_FLASH = ['cloud_magic_trail0.png', 'cloud_magic_trail1.png', 
+'cloud_magic_trail2.png', 'cloud_magic_trail3.png']
+FLASH_DURATION = 40
+
+# Layers
+WALL_LAYER = 1
+PLAYER_LAYER = 2
+MOB_LAYER = 2
+PROJECTILE_LAYER = 3
+EFFECTS_LAYER = 4
