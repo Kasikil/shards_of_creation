@@ -95,13 +95,11 @@ class Game():
         img_folder = path.join(game_folder, 'img')
         sound_folder = path.join(game_folder, 'sound')
         music_folder = path.join(game_folder, 'music')
-        assets_folder = path.join(game_folder, 'assets')
-        self.title_font = path.join(assets_folder, 'ENDOR.TTF')
+        self.assets_folder = path.join(game_folder, 'assets')
+        self.title_font = path.join(self.assets_folder, 'ENDOR.TTF')
+        self.hud_font = path.join(self.assets_folder, 'RINGM.TTF')
         self.dim_screen = pygame.Surface(self.screen.get_size()).convert_alpha()
         self.dim_screen.fill((0, 0, 0, 180))
-        self.map = TiledMap(path.join(assets_folder, 'map.tmx'))
-        self.map_img = self.map.make_map()
-        self.map_rect = self.map_img.get_rect()
         self.player_img = pygame.image.load(path.join(img_folder, PLAYER_IMG)).convert_alpha()
         self.projectile_images = {}
         self.projectile_images['lg'] = pygame.image.load(path.join(img_folder, PROJECTILE_IMG)).convert_alpha()
@@ -149,6 +147,10 @@ class Game():
         self.mobs = pygame.sprite.Group()
         self.projectiles = pygame.sprite.Group()
         self.items = pygame.sprite.Group()
+
+        self.map = TiledMap(path.join(self.assets_folder, 'map.tmx'))
+        self.map_img = self.map.make_map()
+        self.map_rect = self.map_img.get_rect()
         
         for tile_object in self.map.tmxdata.objects:
             obj_center = vector(tile_object.x + tile_object.width / 2,
@@ -186,6 +188,9 @@ class Game():
         """
         self.all_sprites.update()
         self.camera.update(self.player)
+        # game over?
+        if len(self.mobs) == 0:
+            self.playing = False
         # player hits items
         hits = pygame.sprite.spritecollide(self.player, self.items, False)
         for hit in hits:
@@ -212,9 +217,10 @@ class Game():
             self.player.position += vector(MOB_KNOCKBACK, 0).rotate(-hits[0].rotation)
         # projectiles hit mobs
         hits = pygame.sprite.groupcollide(self.mobs, self.projectiles, False, True)
-        for hit in hits:
-            hit.health -= WEAPONS[self.player.weapon]['damage'] * len(hits[hit])
-            hit.velocity = vector(0, 0)
+        for mob in hits:
+            for projectile in hits[mob]:
+                mob.health -= projectile.damage
+            mob.velocity = vector(0, 0)
 
     def draw_grid(self):
         for x in range(0, WIDTH, TILESIZE):
@@ -245,6 +251,8 @@ class Game():
         # Always last in drawing "flip"
         # HUD functions
         draw_player_health(self.screen, 10, 10, self.player.health / PLAYER_HEALTH)
+        self.draw_text('Shades: {}'.format(len(self.mobs)), self.hud_font, 30, WHITE, 
+                        WIDTH - 10, 10, align="ne")
         if self.paused:
             self.screen.blit(self.dim_screen, (0, 0))
             self.draw_text('Paused', self.title_font, 50, RED, WIDTH / 2, HEIGHT / 2, align='center')
@@ -267,7 +275,25 @@ class Game():
         pass
 
     def show_go_screen(self):
-        pass
+        self.screen.fill(BLACK)
+        self.draw_text('GAME OVER', self.title_font, 100, RED, 
+                        WIDTH / 2, HEIGHT / 2, align="center")
+        self.draw_text('Press a key to start', self.title_font, 75, WHITE, 
+                        WIDTH / 2, HEIGHT * 3 / 4, align="center")
+        pygame.display.flip()
+        self.wait_for_key()
+
+    def wait_for_key(self):
+        pygame.event.wait()
+        waiting = True
+        while waiting:
+            self.clock.tick(FPS)
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    waiting = False
+                    self.quit()
+                if event.type == pygame.KEYUP:
+                    waiting = False
 
 
 game = Game()
@@ -275,3 +301,4 @@ game.show_start_screen()
 while True:
     game.new()
     game.run()
+    game.show_go_screen()

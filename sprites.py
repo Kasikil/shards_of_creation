@@ -96,7 +96,7 @@ class Player(pygame.sprite.Sprite):
             self.velocity += vector(-WEAPONS[self.weapon]['oomf'], 0).rotate(-self.rotation)
             for trashy_coding in range(WEAPONS[self.weapon]['projectile_count']):
                 spread = uniform(-WEAPONS[self.weapon]['spread'], WEAPONS[self.weapon]['spread'])
-                Projectile(self.game, self.rotation, position, direction.rotate(spread))
+                Projectile(self.game, self.rotation, position, direction.rotate(spread), WEAPONS[self.weapon]['damage'])
                 sound = choice(self.game.weapon_sounds[self.weapon])
                 if sound.get_num_channels() > 2:
                     sound.stop()
@@ -198,7 +198,7 @@ class Mob(pygame.sprite.Sprite):
 
 
 class Projectile(pygame.sprite.Sprite):
-    def __init__(self, game, rotation, position, direction):
+    def __init__(self, game, rotation, position, direction, damage):
         self._layer = PROJECTILE_LAYER
         self.groups = game.all_sprites, game.projectiles
         pygame.sprite.Sprite.__init__(self, self.groups)
@@ -213,6 +213,7 @@ class Projectile(pygame.sprite.Sprite):
         # spread = uniform(-PROJECTILE_SPREAD, PROJECTILE_SPREAD)
         self.velocity = direction * WEAPONS[self.game.player.weapon]['projectile_speed'] * uniform(0.9, 1.1)
         self.spawn_time = pygame.time.get_ticks()
+        self.damage = damage
 
     def update(self):
         self.position += self.velocity * self.game.dt
