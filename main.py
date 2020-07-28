@@ -57,8 +57,8 @@ class Game():
         """
         Initializes pygame and create game window
         """
+        pygame.mixer.pre_init(44100, -16, 1, 2048) # Last value (buffer size) increased to decrease delay in playing
         pygame.init()
-        pygame.mixer.init()
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
         pygame.display.set_caption(TITLE)
         self.clock = pygame.time.Clock()
@@ -103,7 +103,9 @@ class Game():
         self.map_img = self.map.make_map()
         self.map_rect = self.map_img.get_rect()
         self.player_img = pygame.image.load(path.join(img_folder, PLAYER_IMG)).convert_alpha()
-        self.projectile_img = pygame.image.load(path.join(img_folder, PROJECTILE_IMG)).convert_alpha()
+        self.projectile_images = {}
+        self.projectile_images['lg'] = pygame.image.load(path.join(img_folder, PROJECTILE_IMG)).convert_alpha()
+        self.projectile_images['sm'] = pygame.transform.scale(self.projectile_images['lg'], (10, 10))
         self.mob_img = pygame.image.load(path.join(img_folder, MOB_IMG)).convert_alpha()
         self.splat = pygame.image.load(path.join(img_folder, MOB_SPLAT)).convert_alpha()
         self.splat = pygame.transform.scale(self.splat, (TILESIZE, TILESIZE))
@@ -120,9 +122,12 @@ class Game():
         for type in EFFECTS_SOUNDS:
             self.effect_sounds[type] = pygame.mixer.Sound(path.join(sound_folder, EFFECTS_SOUNDS[type]))
         self.weapon_sounds = {}
-        self.weapon_sounds['vampirism'] = []
-        for sound in CASTING_SOUNDS_VAMPIRISM:
-            self.weapon_sounds['vampirism'].append(pygame.mixer.Sound(path.join(sound_folder, sound)))
+        for casting in CASTING_SOUNDS:
+            self.weapon_sounds[casting] = []
+            for sound in CASTING_SOUNDS[casting]:
+                s = pygame.mixer.Sound(path.join(sound_folder, sound))
+                s.set_volume(0.3)
+                self.weapon_sounds[casting].append(s)
         self.mob_standard_sounds = []
         for sound in MOB_STANDARD_SOUNDS:
             s = pygame.mixer.Sound(path.join(sound_folder, sound))
@@ -203,7 +208,7 @@ class Game():
         # projectiles hit mobs
         hits = pygame.sprite.groupcollide(self.mobs, self.projectiles, False, True)
         for hit in hits:
-            hit.health -= PROJECTILE_DAMAGE
+            hit.health -= WEAPONS[self.player.weapon]['damage'] * len(hits[hit])
             hit.velocity = vector(0, 0)
 
     def draw_grid(self):

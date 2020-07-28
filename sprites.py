@@ -68,6 +68,7 @@ class Player(pygame.sprite.Sprite):
         self.rotation = 0
         self.last_shot = 0
         self.health = PLAYER_HEALTH
+        self.weapon = 'fire_blast'
 
     def get_keys(self):
         self.rotation_speed = 0
@@ -82,15 +83,23 @@ class Player(pygame.sprite.Sprite):
         if keys[pygame.K_DOWN] or keys[pygame.K_s]:
             self.velocity = vector(-PLAYER_SPEED / 2, 0).rotate(-self.rotation)
         if keys[pygame.K_SPACE]:
-            now = pygame.time.get_ticks()
-            if now - self.last_shot > PROJECTILE_RATE:
-                self.last_shot = now
-                direction = vector(1, 0).rotate(-self.rotation)
-                position = self.position + PROJECTILE_LAUNCH_OFFSET.rotate(-self.rotation)
-                Projectile(self.game, self.rotation, position, direction)
-                self.velocity += vector(-PROJECTILE_OOMF, 0).rotate(-self.rotation)
-                choice(self.game.weapon_sounds['vampirism']).play()
-                CastingFlash(self.game, position)
+            self.shoot()
+
+    def shoot(self):
+        now = pygame.time.get_ticks()
+        if now - self.last_shot > WEAPONS[self.weapon]['rate']:
+            self.last_shot = now
+            direction = vector(1, 0).rotate(-self.rotation)
+            position = self.position + PROJECTILE_LAUNCH_OFFSET.rotate(-self.rotation)
+            self.velocity += vector(-WEAPONS[self.weapon]['oomf'], 0).rotate(-self.rotation)
+            for trashy_coding in range(WEAPONS[self.weapon]['projectile_count']):
+                spread = uniform(-WEAPONS[self.weapon]['spread'], WEAPONS[self.weapon]['spread'])
+                Projectile(self.game, self.rotation, position, direction.rotate(spread))
+                sound = choice(self.game.weapon_sounds[self.weapon])
+                if sound.get_num_channels() > 2:
+                    sound.stop()
+                sound.play()
+            CastingFlash(self.game, position)
 
 
     def update(self):
@@ -185,14 +194,14 @@ class Projectile(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.game = game
         self.rotation = rotation
-        self.image = game.projectile_img
-        self.image = pygame.transform.rotate(self.game.projectile_img, self.rotation)
+        self.image = game.projectile_images[WEAPONS[self.game.player.weapon]['projectile_size']]
+        self.image = pygame.transform.rotate(self.game.projectile_images[WEAPONS[self.game.player.weapon]['projectile_size']], self.rotation)
         self.rect = self.image.get_rect()
         self.hit_rect = self.rect
         self.position = vector(position)
         self.rect.center = position
-        spread = uniform(-PROJECTILE_SPREAD, PROJECTILE_SPREAD)
-        self.velocity = direction.rotate(spread) * PROJECTILE_SPEED
+        # spread = uniform(-PROJECTILE_SPREAD, PROJECTILE_SPREAD)
+        self.velocity = direction * WEAPONS[self.game.player.weapon]['projectile_speed']
         self.spawn_time = pygame.time.get_ticks()
 
     def update(self):
@@ -200,7 +209,7 @@ class Projectile(pygame.sprite.Sprite):
         self.rect.center = self.position
         if pygame.sprite.spritecollideany(self, self.game.walls):
             self.kill()
-        if pygame.time.get_ticks() - self.spawn_time > PROJECTILE_LIFETIME:
+        if pygame.time.get_ticks() - self.spawn_time > WEAPONS[self.game.player.weapon]['projectile_lifetime']:
             self.kill()
 
 

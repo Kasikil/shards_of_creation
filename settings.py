@@ -53,14 +53,26 @@ MOB_KNOCKBACK = 20
 AVOID_RADIUS = 50
 DETECT_RADIUS = 200
 
-# Projectile Settings
+# Weapon Settings
 PROJECTILE_IMG = 'i-vampiricism.png'
-PROJECTILE_SPEED = 500
-PROJECTILE_LIFETIME = 1000 # ms
-PROJECTILE_RATE = 150
-PROJECTILE_OOMF = 200
-PROJECTILE_SPREAD = 5
-PROJECTILE_DAMAGE = 10
+WEAPONS = {}
+WEAPONS['vampirism'] = {'projectile_speed': 500,
+                        'projectile_lifetime': 1000,
+                        'rate': 250,
+                        'oomf': 200,
+                        'spread': 5,
+                        'damage': 10,
+                        'projectile_size': 'lg',
+                        'projectile_count': 1}
+
+WEAPONS['fire_blast'] = {'projectile_speed': 400,
+                        'projectile_lifetime': 500,
+                        'rate': 900,
+                        'oomf': 300,
+                        'spread': 20,
+                        'damage': 5,
+                        'projectile_size': 'sm',
+                        'projectile_count': 12}
 
 # Player Settings
 PLAYER_HEALTH = 100
@@ -94,5 +106,6 @@ BACKGROUND_MUSIC = 'Ketsa_-_08_-_Multiverse.mp3'
 PLAYER_HIT_SOUNDS = ['elephant.wav']
 MOB_STANDARD_SOUNDS = ['shade1.wav', 'shade2.wav', 'shade3.wav', 'shade4.wav', 'shade5.wav']
 MOB_HIT_SOUNDS = ['shade14.wav']
-CASTING_SOUNDS_VAMPIRISM = ['vampiristic_kiss.wav']
+CASTING_SOUNDS = {'vampirism': ['vampiristic_kiss.wav'],
+                  'fire_blast': ['Fireball.wav']}
 EFFECTS_SOUNDS = {'level_start': 'spell.wav', 'health_up': 'bottle.wav'}
