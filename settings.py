@@ -86,6 +86,7 @@ PROJECTILE_LAUNCH_OFFSET = vector(15, 5)
 CASTING_FLASH = ['cloud_magic_trail0.png', 'cloud_magic_trail1.png', 
 'cloud_magic_trail2.png', 'cloud_magic_trail3.png']
 FLASH_DURATION = 40
+DAMAGE_ALPHA = [alpha for alpha in range(0, 255, 25)]
 
 # Layers
 WALL_LAYER = 1
@@ -96,7 +97,8 @@ PROJECTILE_LAYER = 3
 EFFECTS_LAYER = 4
 
 # Items
-ITEM_IMAGES = {'health': 'health_potion.png'}
+ITEM_IMAGES = {'health': 'health_potion.png',
+               'fire_blast': 'fire_blast.png'}
 HEALTH_PACK_AMOUNT = 20
 BOB_RANGE = 15
 BOB_SPEED = 0.4
@@ -108,4 +110,6 @@ MOB_STANDARD_SOUNDS = ['shade1.wav', 'shade2.wav', 'shade3.wav', 'shade4.wav', '
 MOB_HIT_SOUNDS = ['shade14.wav']
 CASTING_SOUNDS = {'vampirism': ['vampiristic_kiss.wav'],
                   'fire_blast': ['Fireball.wav']}
-EFFECTS_SOUNDS = {'level_start': 'spell.wav', 'health_up': 'bottle.wav'}
+EFFECTS_SOUNDS = {'level_start': 'spell.wav', 
+                  'health_up': 'bottle.wav',
+                  'spell_pickup': 'spell_pickup.wav'}

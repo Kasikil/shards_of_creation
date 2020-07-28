@@ -160,7 +160,7 @@ class Game():
             if tile_object.name == 'wall':
                 Obstacle(self, tile_object.x, tile_object.y, 
                 tile_object.width, tile_object.height)
-            if tile_object.name in ['health']:
+            if tile_object.name in ['health', 'fire_blast']:
                 Item(self, obj_center, tile_object.name)
         self.camera = Camera(self.map.width, self.map.height)
         self.paused = False
@@ -193,6 +193,10 @@ class Game():
                 hit.kill()
                 self.effect_sounds['health_up'].play()
                 self.player.add_health(HEALTH_PACK_AMOUNT)
+            if hit.type == 'fire_blast':
+                hit.kill()
+                self.effect_sounds['spell_pickup'].play()
+                self.player.weapon = 'fire_blast'
 
         # mobs hits player
         hits = pygame.sprite.spritecollide(self.player, self.mobs, False, collide_hit_rect)
@@ -204,6 +208,7 @@ class Game():
             if self.player.health <= 0:
                 self.playing = False
         if hits:
+            self.player.hit()
             self.player.position += vector(MOB_KNOCKBACK, 0).rotate(-hits[0].rotation)
         # projectiles hit mobs
         hits = pygame.sprite.groupcollide(self.mobs, self.projectiles, False, True)

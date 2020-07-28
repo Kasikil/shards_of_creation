@@ -10,6 +10,7 @@
 
 try:
     # Standard Python Imports
+    from itertools import chain
     import os
     import pygame
     import pytweening
@@ -68,7 +69,8 @@ class Player(pygame.sprite.Sprite):
         self.rotation = 0
         self.last_shot = 0
         self.health = PLAYER_HEALTH
-        self.weapon = 'fire_blast'
+        self.weapon = 'vampirism'
+        self.damaged = False
 
     def get_keys(self):
         self.rotation_speed = 0
@@ -101,11 +103,19 @@ class Player(pygame.sprite.Sprite):
                 sound.play()
             CastingFlash(self.game, position)
 
+    def hit(self):
+        self.damaged = True
+        self.damage_alpha = chain(DAMAGE_ALPHA * 2)
 
     def update(self):
         self.get_keys()
         self.rotation = (self.rotation + self.rotation_speed * self.game.dt) % 360
         self.image = pygame.transform.rotate(self.game.player_img, self.rotation)
+        if self.damaged:
+            try:
+                self.image.fill((255, 0, 0, next(self.damage_alpha)), special_flags=pygame.BLEND_RGBA_MULT)
+            except StopIteration:
+                self.damaged = False
         self.rect = self.image.get_rect()
         self.rect.center = self.position
         self.position += self.velocity * self.game.dt
@@ -201,7 +211,7 @@ class Projectile(pygame.sprite.Sprite):
         self.position = vector(position)
         self.rect.center = position
         # spread = uniform(-PROJECTILE_SPREAD, PROJECTILE_SPREAD)
-        self.velocity = direction * WEAPONS[self.game.player.weapon]['projectile_speed']
+        self.velocity = direction * WEAPONS[self.game.player.weapon]['projectile_speed'] * uniform(0.9, 1.1)
         self.spawn_time = pygame.time.get_ticks()
 
     def update(self):
