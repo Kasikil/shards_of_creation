@@ -87,6 +87,9 @@ CASTING_FLASH = ['cloud_magic_trail0.png', 'cloud_magic_trail1.png',
 'cloud_magic_trail2.png', 'cloud_magic_trail3.png']
 FLASH_DURATION = 40
 DAMAGE_ALPHA = [alpha for alpha in range(0, 255, 25)]
+NIGHT_COLOR = (20, 20, 20)
+LIGHT_RADIUS = (500, 500)
+LIGHT_MASK = 'light_350_med.png'
 
 # Layers
 WALL_LAYER = 1

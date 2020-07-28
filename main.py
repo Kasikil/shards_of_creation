@@ -113,6 +113,12 @@ class Game():
         self.item_images = {}
         for item in ITEM_IMAGES:
             self.item_images[item] = pygame.image.load(path.join(img_folder, ITEM_IMAGES[item])).convert_alpha()
+        # lighting effect
+        self.fog = pygame.Surface((WIDTH, HEIGHT))
+        self.fog.fill(NIGHT_COLOR)
+        self.light_mask = pygame.image.load(path.join(img_folder, LIGHT_MASK)).convert_alpha()
+        self.light_mask = pygame.transform.scale(self.light_mask, LIGHT_RADIUS)
+        self.light_rect = self.light_mask.get_rect()
 
         # Sound Loading
         pygame.mixer.music.load(path.join(music_folder, BACKGROUND_MUSIC))
@@ -166,6 +172,7 @@ class Game():
                 Item(self, obj_center, tile_object.name)
         self.camera = Camera(self.map.width, self.map.height)
         self.paused = False
+        self.night = False
         self.effect_sounds['level_start'].play()
 
     def run(self):
@@ -228,6 +235,13 @@ class Game():
         for y in range(0, HEIGHT, TILESIZE):
             pygame.draw.line(self.screen, LIGHTGREY, (0, y), (WIDTH, y))
 
+    def render_fog(self):
+        # draw the light mask (gradient) onto fog image
+        self.fog.fill(NIGHT_COLOR)
+        self.light_rect.center = self.camera.apply(self.player).center
+        self.fog.blit(self.light_mask, self.light_rect)
+        self.screen.blit(self.fog, (0, 0), special_flags=pygame.BLEND_MULT)
+
     def draw(self):
         """
         Draw portion of the game loop
@@ -248,7 +262,9 @@ class Game():
                 pygame.draw.rect(self.screen, CYAN, self.camera.apply_rect(wall.rect), 1)
 
         # pygame.draw.rect(self.screen, WHITE, self.player.hit_rect, 2)
-        # Always last in drawing "flip"
+        if self.night:
+            self.render_fog()
+
         # HUD functions
         draw_player_health(self.screen, 10, 10, self.player.health / PLAYER_HEALTH)
         self.draw_text('Shades: {}'.format(len(self.mobs)), self.hud_font, 30, WHITE, 
@@ -256,6 +272,7 @@ class Game():
         if self.paused:
             self.screen.blit(self.dim_screen, (0, 0))
             self.draw_text('Paused', self.title_font, 50, RED, WIDTH / 2, HEIGHT / 2, align='center')
+        # Always last in drawing "flip"
         pygame.display.flip()
 
     def events(self):
@@ -270,6 +287,8 @@ class Game():
                     self.draw_debug = not self.draw_debug
                 if event.key == pygame.K_p:
                     self.paused = not self.paused
+                if event.key == pygame.K_n:
+                    self.night = not self.night
 
     def show_start_screen(self):
         pass
