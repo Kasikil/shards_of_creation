@@ -325,11 +325,10 @@ class Npc(pygame.sprite.Sprite):
                 self.rotation = target_distance.angle_to(vector(1, 0))
                 self.rect = self.image.get_rect()
                 self.velocity = vector(self.speed, 0).rotate(-self.rotation)
-                
                 if (self.velocity * self.game.dt).length_squared() < target_distance.length_squared():
                     self.position += self.velocity * self.game.dt
                 else:
-                    self.position = self.target
+                    self.position = vector(self.target.x, self.target.y)
                 self.hit_rect.centerx = self.position.x
                 collide_with_walls(self, self.game.walls, 'x')
                 self.hit_rect.centery = self.position.y
@@ -345,6 +344,5 @@ class Npc(pygame.sprite.Sprite):
                 pass
             elif self.waymode == 'sleep' and wait_time >= self.wait_location_time: # Done waiting, onwards to the next point
                 self.target = next(self.waypoints)
-                print()
                 self.waymode = 'find'
 
