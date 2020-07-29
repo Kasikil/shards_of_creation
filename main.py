@@ -97,14 +97,16 @@ class Game():
         self.load_dim()
         self.load_images()
         self.load_sound()
+        self.load_dialogue()
 
     def load_folders(self):
         self.game_folder = path.dirname(__file__)
-        self.assets_folder = path.join(game_folder, 'assets')
-        self.img_folder = path.join(game_folder, 'img')
-        self.npc_img_folder = path.join(img_folder, 'npcs')
-        self.sound_folder = path.join(game_folder, 'sound')
-        self.music_folder = path.join(game_folder, 'music')
+        self.assets_folder = path.join(self.game_folder, 'assets')
+        self.img_folder = path.join(self.game_folder, 'img')
+        self.npc_img_folder = path.join(self.img_folder, 'npcs')
+        self.sound_folder = path.join(self.game_folder, 'sound')
+        self.music_folder = path.join(self.game_folder, 'music')
+        self.dialogue = path.join(self.assets_folder, 'dialogue_scripts')
     
     def load_fonts(self):
         self.title_font = path.join(self.assets_folder, 'ENDOR.TTF')
@@ -163,6 +165,9 @@ class Game():
         self.mob_hit_sounds = []
         for sound in MOB_HIT_SOUNDS:
             self.mob_hit_sounds.append(pygame.mixer.Sound(path.join(self.sound_folder, sound)))
+
+    def load_dialogue(self):
+        pass
 
     def new(self):
         """

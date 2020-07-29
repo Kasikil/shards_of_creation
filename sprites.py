@@ -72,21 +72,33 @@ class Player(pygame.sprite.Sprite):
         self.health = PLAYER_HEALTH
         self.weapon = 'vampirism'
         self.damaged = False
+        self.busy = False
+        self.conversation_partner = None
+
+    def __repr__(self):
+        return '<Player Current Weapon {}>'.format(self.weapon)
 
     def get_keys(self):
         self.rotation_speed = 0
         self.velocity = vector(0, 0)
         keys = pygame.key.get_pressed()
-        if keys[pygame.K_LEFT] or keys[pygame.K_a]:
-            self.rotation_speed = PLAYER_ROTATION_SPEED
-        if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
-            self.rotation_speed = -PLAYER_ROTATION_SPEED
-        if keys[pygame.K_UP] or keys[pygame.K_w]:
-            self.velocity = vector(PLAYER_SPEED, 0).rotate(-self.rotation)
-        if keys[pygame.K_DOWN] or keys[pygame.K_s]:
-            self.velocity = vector(-PLAYER_SPEED / 2, 0).rotate(-self.rotation)
-        if keys[pygame.K_SPACE]:
-            self.shoot()
+        if not self.busy:
+            if keys[pygame.K_LEFT] or keys[pygame.K_a]:
+                self.rotation_speed = PLAYER_ROTATION_SPEED
+            if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
+                self.rotation_speed = -PLAYER_ROTATION_SPEED
+            if keys[pygame.K_UP] or keys[pygame.K_w]:
+                self.velocity = vector(PLAYER_SPEED, 0).rotate(-self.rotation)
+            if keys[pygame.K_DOWN] or keys[pygame.K_s]:
+                self.velocity = vector(-PLAYER_SPEED / 2, 0).rotate(-self.rotation)
+            if keys[pygame.K_SPACE]:
+                self.shoot()
+            if keys[pygame.K_t]:
+                self.talk()
+        if self.busy and keys[pygame.K_x]:
+            self.busy = False
+            self.conversation_partner.busy = False
+            self.conversation_partner = None
 
     def shoot(self):
         now = pygame.time.get_ticks()
@@ -103,6 +115,13 @@ class Player(pygame.sprite.Sprite):
                     sound.stop()
                 sound.play()
             CastingFlash(self.game, position)
+        
+    def talk(self):
+        hits = pygame.sprite.spritecollide(self, self.game.npcs, False, collide_hit_rect)
+        if hits:
+            hits[0].busy = True
+            self.busy = True
+            self.conversation_partner = hits[0]
 
     def hit(self):
         self.damaged = True
@@ -152,6 +171,8 @@ class Mob(pygame.sprite.Sprite):
         self.speed = choice(MOB_SPEEDS)
         self.target = game.player
 
+    def __repr__(self):
+        return '<Mob Position {}>'.format(self.position)
 
     def avoid_mobs(self):
         for mob in self.game.mobs:
@@ -214,6 +235,9 @@ class Projectile(pygame.sprite.Sprite):
         self.velocity = direction * WEAPONS[self.game.player.weapon]['projectile_speed'] * uniform(0.9, 1.1)
         self.spawn_time = pygame.time.get_ticks()
         self.damage = damage
+
+    def __repr__(self):
+        return '<Projectile {}>'.format(self.position)
 
     def update(self):
         self.position += self.velocity * self.game.dt
@@ -300,6 +324,9 @@ class Npc(pygame.sprite.Sprite):
         self.rotation = 0
         self.health = NPCS[identifier]['health']
         self.speed = NPCS[identifier]['speed']
+        self.busy = False
+
+        # Waypoint System Initialization
         self.waypoint = False
         self.wait_location_time = 0
         self.time_waiting = 0
@@ -317,8 +344,11 @@ class Npc(pygame.sprite.Sprite):
             self.target = next(self.waypoints)
             self.waymode = 'find'
                     
+    def __repr__(self):
+        return '<NPC {} at ({},{})>'.format(self.name, self.position.x, self.position.y)
+
     def update(self):
-        if self.waypoint:
+        if self.waypoint and not self.busy:
             target_distance = (self.target - self.position)
             wait_time = pygame.time.get_ticks() - self.time_waiting
             if self.waymode == 'find' and target_distance.length_squared() != 0: # Not there yet, time to move
@@ -345,4 +375,6 @@ class Npc(pygame.sprite.Sprite):
             elif self.waymode == 'sleep' and wait_time >= self.wait_location_time: # Done waiting, onwards to the next point
                 self.target = next(self.waypoints)
                 self.waymode = 'find'
+        if self.busy:
+            self.dialogue = 'Hello!'
 

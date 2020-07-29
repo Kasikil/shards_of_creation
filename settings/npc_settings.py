@@ -27,4 +27,4 @@ NPCS['Zuan'] = {'name': 'Zuan',
                 'waypoint_system': 'relative', # relative or absolute
                 'waypoints': [[0, 128], [128, 128], [128, 0], [0, 0]],
                 'waysleep': [4000],
-                'dialogue': ''}
+                'dialogue': 'Hello!'}
