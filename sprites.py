@@ -10,7 +10,7 @@
 
 try:
     # Standard Python Imports
-    from itertools import chain
+    from itertools import chain, cycle
     import os
     import pygame
     import pytweening
@@ -18,7 +18,8 @@ try:
     import sys
 
     # Non-Standard Imports
-    from settings import *
+    from settings.settings import *
+    from settings.npc_settings import *
     from tilemap import collide_hit_rect
 except ImportError as err:
     print ('Couldn\'t load module. {}'.format(err))
@@ -210,7 +211,6 @@ class Projectile(pygame.sprite.Sprite):
         self.hit_rect = self.rect
         self.position = vector(position)
         self.rect.center = position
-        # spread = uniform(-PROJECTILE_SPREAD, PROJECTILE_SPREAD)
         self.velocity = direction * WEAPONS[self.game.player.weapon]['projectile_speed'] * uniform(0.9, 1.1)
         self.spawn_time = pygame.time.get_ticks()
         self.damage = damage
@@ -236,6 +236,7 @@ class Obstacle(pygame.sprite.Sprite):
         self.rect.x = x
         self.rect.y = y
 
+
 class CastingFlash(pygame.sprite.Sprite):
     def __init__(self, game, position):
         self._layer = EFFECTS_LAYER
@@ -253,6 +254,7 @@ class CastingFlash(pygame.sprite.Sprite):
     def update(self):
         if pygame.time.get_ticks() - self.spawn_time > FLASH_DURATION:
             self.kill()
+
 
 class Item(pygame.sprite.Sprite):
     def __init__(self, game, position, type):
@@ -278,3 +280,71 @@ class Item(pygame.sprite.Sprite):
         if self.step > BOB_RANGE:
             self.step = 0
             self.direction *= -1
+
+
+class Npc(pygame.sprite.Sprite):
+    def __init__(self, game, x, y, identifier):
+        self._layer = NPC_LAYER
+        self.groups = game.all_sprites, game.npcs
+        pygame.sprite.Sprite.__init__(self, self.groups)
+        self.game = game
+        self.name = NPCS[identifier]['name']
+        self.image = self.game.npc_images[self.name].copy()
+        self.rect = self.image.get_rect()
+        self.rect.center = (x, y)
+        self.hit_rect = NPCS[identifier]['hit_rect'].copy()
+        self.hit_rect.center = self.rect.center
+        self.position = vector(x, y)
+        self.velocity = vector(0, 0)
+        self.rect.center = self.position
+        self.rotation = 0
+        self.health = NPCS[identifier]['health']
+        self.speed = NPCS[identifier]['speed']
+        self.waypoint = False
+        self.wait_location_time = 0
+        self.time_waiting = 0
+        if NPCS[identifier]['movement_method'] == 'waypoint':
+            self.waypoint = True
+            if NPCS[identifier]['waypoint_system'] == 'relative':
+                abs_ways = []
+                for waypoint in NPCS[identifier]['waypoints']:
+                    waypoint = [waypoint[0] + x, waypoint[1] + y]
+                    abs_ways.append(vector(waypoint[0], waypoint[1]))
+                self.waypoints = cycle(abs_ways)
+            else:
+                self.waypoints = cycle(NPCS[identifier]['waypoints'])
+            self.waysleep = cycle(NPCS[identifier]['waysleep'])
+            self.target = next(self.waypoints)
+            self.waymode = 'find'
+                    
+    def update(self):
+        if self.waypoint:
+            target_distance = (self.target - self.position)
+            wait_time = pygame.time.get_ticks() - self.time_waiting
+            if self.waymode == 'find' and target_distance.length_squared() != 0: # Not there yet, time to move
+                self.rotation = target_distance.angle_to(vector(1, 0))
+                self.rect = self.image.get_rect()
+                self.velocity = vector(self.speed, 0).rotate(-self.rotation)
+                
+                if (self.velocity * self.game.dt).length_squared() < target_distance.length_squared():
+                    self.position += self.velocity * self.game.dt
+                else:
+                    self.position = self.target
+                self.hit_rect.centerx = self.position.x
+                collide_with_walls(self, self.game.walls, 'x')
+                self.hit_rect.centery = self.position.y
+                collide_with_walls(self, self.game.walls, 'y')
+                self.rect.center = self.hit_rect.center
+                self.image = pygame.transform.rotate(self.game.npc_images[self.name], self.rotation)
+                self.rect.center = self.position
+            elif self.waymode == 'find' and target_distance.length_squared() == 0: # NPC is there, time to wait
+                self.waymode = 'sleep'
+                self.wait_location_time = next(self.waysleep)
+                self.time_waiting = pygame.time.get_ticks()
+            elif self.waymode == 'sleep' and wait_time < self.wait_location_time: # Waiting
+                pass
+            elif self.waymode == 'sleep' and wait_time >= self.wait_location_time: # Done waiting, onwards to the next point
+                self.target = next(self.waypoints)
+                print()
+                self.waymode = 'find'
+

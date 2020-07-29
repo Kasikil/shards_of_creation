@@ -1,7 +1,7 @@
 ####################################################################
 #
 #
-# Shards of Creation -- settings --
+# Shards of Creation -- settings.settings --
 # A Fantasy Narrative RPG
 # Liscense Here
 #
@@ -96,6 +96,7 @@ WALL_LAYER = 1
 ITEMS_LAYER = 1
 PLAYER_LAYER = 2
 MOB_LAYER = 2
+NPC_LAYER = 2
 PROJECTILE_LAYER = 3
 EFFECTS_LAYER = 4
 
