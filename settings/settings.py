@@ -16,7 +16,6 @@ except ImportError as err:
     raise
 
 vector = pygame.math.Vector2
-
 # Debug Settings
 DEBUG = True
 

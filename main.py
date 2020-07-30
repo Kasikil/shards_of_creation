@@ -16,14 +16,18 @@ try:
     from os import path
     import pygame    
     from pygame.locals import *
-    import random
+    from random import choice, random
     from socket import *
     import sys
 
     # Non-Standard Imports
     from settings.settings import *
     from settings.npc_settings import *
-    from sprites import *
+    from sprites.itemSprite import Item, Potion, Spell
+    from sprites.mobSprite import Mob
+    from sprites.npcSprite import Npc
+    from sprites.obstacleSprite import Obstacle
+    from sprites.playerSprite import Player
     from tilemap import *
 except ImportError as err:
     print ('Couldn\'t load module. {}'.format(err))
@@ -146,7 +150,7 @@ class Game():
         # lighting effect
         self.fog = pygame.Surface((WIDTH, HEIGHT))
         self.fog.fill(NIGHT_COLOR)
-        self.light_mask = pygame.image.load(path.join(img_folder, LIGHT_MASK)).convert_alpha()
+        self.light_mask = pygame.image.load(path.join(self.img_folder, LIGHT_MASK)).convert_alpha()
         self.light_mask = pygame.transform.scale(self.light_mask, LIGHT_RADIUS)
         self.light_rect = self.light_mask.get_rect()
 
