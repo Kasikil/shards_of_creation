@@ -63,7 +63,7 @@ DIALOGUE_FONT_SIZE = 12
 DIALOGUE_ALLOWED_WIDTH = WIDTH - DIALOGUE_TEXT_X
 
 # Mob Settings
-MOB_IMG = 'maurice_flip.png'
+MOB_IMG = 'shade.png'
 MOB_SPLAT = 'shade_splat.png'
 MOB_SPEEDS = [150, 100, 75, 125]
 MOB_HIT_RECT = pygame.Rect(0, 0, 35, 35)
@@ -74,7 +74,7 @@ AVOID_RADIUS = 50
 DETECT_RADIUS = 200
 
 # Weapon Settings
-PROJECTILE_IMG = 'i-vampiricism.png'
+PROJECTILE_IMG = 'FireBlast.png'
 WEAPONS = {}
 WEAPONS['vampirism'] = {'projectile_speed': 500,
                         'projectile_lifetime': 1000,
@@ -98,13 +98,12 @@ WEAPONS['fire_blast'] = {'projectile_speed': 400,
 PLAYER_HEALTH = 100
 PLAYER_SPEED = 300
 PLAYER_ROTATION_SPEED = 250 # degress/second
-PLAYER_IMG = 'elephant.png'
+PLAYER_IMG = 'player.png'
 PLAYER_HIT_RECT = pygame.Rect(0, 0, 30, 30)
 PROJECTILE_LAUNCH_OFFSET = vector(15, 5)
 
 # Effects
-CASTING_FLASH = ['cloud_magic_trail0.png', 'cloud_magic_trail1.png', 
-'cloud_magic_trail2.png', 'cloud_magic_trail3.png']
+CASTING_FLASH = ['CastingEffect0.png', 'CastingEffect1.png']
 FLASH_DURATION = 40
 DAMAGE_ALPHA = [alpha for alpha in range(0, 255, 25)]
 NIGHT_COLOR = (20, 20, 20)
@@ -121,8 +120,8 @@ PROJECTILE_LAYER = 3
 EFFECTS_LAYER = 4
 
 # Items
-ITEM_IMAGES = {'health': 'health_potion.png',
-               'fire_blast': 'fire_blast.png'}
+ITEM_IMAGES = {'health': 'HealthPotion.png',
+               'fire_blast': 'FireSpell.png'}
 HEALTH_PACK_AMOUNT = 20
 BOB_RANGE = 15
 BOB_SPEED = 0.4
