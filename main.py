@@ -65,6 +65,7 @@ class Game():
         self.clock = pygame.time.Clock()
         pygame.key.set_repeat(500, 100)
         self.dialogue_box = pygame.Rect(DIALOGUE_BOX_X, DIALOGUE_BOX_Y, DIALOGUE_BOX_WIDTH, DIALOGUE_BOX_HEIGHT)
+        self.inventory_box = pygame.Rect(INVENTORY_BOX_X, INVENTORY_BOX_Y, INVENTORY_BOX_WIDTH, INVENTORY_BOX_HEIGHT)
         self.load_data()
         self.draw_debug = False
 
@@ -117,6 +118,9 @@ class Game():
         self.hud_font = pygame.font.Font(self.hud_font_file, HUD_FONT_SIZE)
         self.dialogue_font_file = path.join(self.assets_folder, 'arial.TTF')
         self.dialogue_font = pygame.font.Font(self.dialogue_font_file, DIALOGUE_FONT_SIZE)
+        self.inventory_item_font = pygame.font.Font(self.dialogue_font_file, INVENTORY_FONT_SIZE)
+        fw, fh = self.inventory_item_font.size('Inventory')
+        self.inventory_item_font_height = fh
     
     def load_dim(self):
         self.dim_screen = pygame.Surface(self.screen.get_size()).convert_alpha()
@@ -207,6 +211,7 @@ class Game():
         self.camera = Camera(self.map.width, self.map.height)
         self.paused = False
         self.night = False
+        self.inventory = False
         self.effect_sounds['level_start'].play()
 
     def run(self):
@@ -215,8 +220,10 @@ class Game():
         while self.playing:
             self.dt = self.clock.tick(FPS) / 1000
             self.events()
-            if not self.paused:
+            if not self.paused and not self.inventory:
                 self.update()
+            elif self.inventory and not self.paused:
+                self.player.update()
             self.draw()
 
     def quit(self):
@@ -289,17 +296,26 @@ class Game():
         y_offset = 0
         for line in lines:
             fw, fh = font.size(line)
-            ty = DIALOGUE_TEXT_Y + y_offset
-            self.draw_text(line, self.dialogue_font, 
-                           WHITE, DIALOGUE_TEXT_X, ty)
-            y_offset += fh
+            ty = y + y_offset
+            self.draw_text(line, font, 
+                           color, x, ty)
+            y_offset += fh + 1
 
     def draw_dialogue_box(self):
         pygame.draw.rect(self.screen, BLACK, self.dialogue_box)
         pygame.draw.rect(self.screen, WHITE, self.dialogue_box, DIALOGUE_BOX_OUTLINE)
         if self.player.busy and self.player.conversation_partner:
             self.draw_wrapped_text(self.player.conversation_partner.dialogue, self.dialogue_font,
-            WHITE, DIALOGUE_TEXT_X, DIALOGUE_TEXT_Y, DIALOGUE_ALLOWED_WIDTH)
+                                   WHITE, DIALOGUE_TEXT_X, DIALOGUE_TEXT_Y, DIALOGUE_ALLOWED_WIDTH)
+
+    def draw_inventory(self):
+        pygame.draw.rect(self.screen, BLACK, self.inventory_box)
+        pygame.draw.rect(self.screen, WHITE, self.inventory_box, INVENTORY_BOX_OUTLINE)
+        inventory_item_y = INVENTORY_TEXT_Y
+        for item in self.player.player_inventory:
+            self.draw_wrapped_text(item.type, self.inventory_item_font, WHITE, INVENTORY_TEXT_X, 
+                                   inventory_item_y, INVENTORY_ALLOWED_WIDTH)
+            inventory_item_y += self.inventory_item_font_height + 2
 
     def draw(self):
         """
@@ -330,9 +346,16 @@ class Game():
 
         # self.draw_text('Shades: {}'.format(len(self.mobs)), self.hud_font, WHITE, 
         #                 WIDTH - 10, 10, align="ne")
+
+        # Draw inventory
+        if self.inventory:
+            self.draw_inventory()
+
+        # Paused
         if self.paused:
             self.screen.blit(self.dim_screen, (0, 0))
             self.draw_text('Paused', self.pause_font, RED, WIDTH / 2, HEIGHT / 2, align='center')
+
         # Always last in drawing "flip"
         pygame.display.flip()
 

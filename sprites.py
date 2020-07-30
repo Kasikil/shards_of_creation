@@ -74,6 +74,8 @@ class Player(pygame.sprite.Sprite):
         self.damaged = False
         self.busy = False
         self.conversation_partner = None
+        self.player_inventory = [Item(self.game, vector(0, 0), 'health'), Item(self.game, vector(0, 0), 'fire_blast')]
+        self.inventory_idx = 0
 
     def __repr__(self):
         return '<Player Current Weapon {}>'.format(self.weapon)
@@ -82,7 +84,7 @@ class Player(pygame.sprite.Sprite):
         self.rotation_speed = 0
         self.velocity = vector(0, 0)
         keys = pygame.key.get_pressed()
-        if not self.busy:
+        if not self.busy and not self.game.inventory:
             if keys[pygame.K_LEFT] or keys[pygame.K_a]:
                 self.rotation_speed = PLAYER_ROTATION_SPEED
             if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
@@ -95,10 +97,40 @@ class Player(pygame.sprite.Sprite):
                 self.shoot()
             if keys[pygame.K_t]:
                 self.talk()
+            if keys[pygame.K_e]:
+                self.game.inventory = True
+        if self.game.inventory:
+            self.get_keys_inventory(keys)
         if self.busy and keys[pygame.K_x]:
             self.busy = False
             self.conversation_partner.busy = False
             self.conversation_partner = None
+
+    def get_keys_inventory(self, keys):
+        if keys[pygame.K_LEFT] or keys[pygame.K_a]:
+            # Deselect 'examine' view in inventory
+            pass
+        if keys[pygame.K_RIGHT] or keys[pygame.K_d] or keys[pygame.K_RETURN]:
+            # Select 'examine' view in inventory
+            pass
+        if keys[pygame.K_UP] or keys[pygame.K_w]:
+            # Scroll up in the inventory
+            if len(self.player_inventory) > 0 and self.inventory_idx > 0:
+                self.inventory_idx -= 1
+            elif len(self.player_inventory) > 0 and self.inventory_idx == 0:
+                self.inventory_idx = len(self.player_inventory) - 1
+            else:
+                self.inventory_idx = 0
+        if keys[pygame.K_DOWN]or keys[pygame.K_s]:
+            # Scroll down in the inventory
+            if len(self.player_inventory) > 0 and self.inventory_idx < (len(self.player_inventory) - 1):
+                self.inventory_idx += 1
+            elif len(self.player_inventory) > 0 and self.inventory_idx == (len(self.player_inventory) - 1):
+                self.inventory_idx = 0
+            else:
+                self.inventory_idx = 0
+        if keys[pygame.K_x]:
+            self.game.inventory = False
 
     def shoot(self):
         now = pygame.time.get_ticks()
@@ -129,21 +161,22 @@ class Player(pygame.sprite.Sprite):
 
     def update(self):
         self.get_keys()
-        self.rotation = (self.rotation + self.rotation_speed * self.game.dt) % 360
-        self.image = pygame.transform.rotate(self.game.player_img, self.rotation)
-        if self.damaged:
-            try:
-                self.image.fill((255, 0, 0, next(self.damage_alpha)), special_flags=pygame.BLEND_RGBA_MULT)
-            except StopIteration:
-                self.damaged = False
-        self.rect = self.image.get_rect()
-        self.rect.center = self.position
-        self.position += self.velocity * self.game.dt
-        self.hit_rect.centerx = self.position.x
-        collide_with_walls(self, self.game.walls, 'x')
-        self.hit_rect.centery = self.position.y
-        collide_with_walls(self, self.game.walls, 'y')
-        self.rect.center = self.hit_rect.center
+        if not self.game.inventory:
+            self.rotation = (self.rotation + self.rotation_speed * self.game.dt) % 360
+            self.image = pygame.transform.rotate(self.game.player_img, self.rotation)
+            if self.damaged:
+                try:
+                    self.image.fill((255, 0, 0, next(self.damage_alpha)), special_flags=pygame.BLEND_RGBA_MULT)
+                except StopIteration:
+                    self.damaged = False
+            self.rect = self.image.get_rect()
+            self.rect.center = self.position
+            self.position += self.velocity * self.game.dt
+            self.hit_rect.centerx = self.position.x
+            collide_with_walls(self, self.game.walls, 'x')
+            self.hit_rect.centery = self.position.y
+            collide_with_walls(self, self.game.walls, 'y')
+            self.rect.center = self.hit_rect.center
 
     def add_health(self, amount):
         self.health += amount
