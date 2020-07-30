@@ -74,7 +74,7 @@ class Player(pygame.sprite.Sprite):
         self.damaged = False
         self.busy = False
         self.conversation_partner = None
-        self.player_inventory = [Item(self.game, vector(0, 0), 'health', False), Item(self.game, vector(0, 0), 'fire_blast', False)]
+        self.player_inventory = [Potion(self.game, HIDDEN_ITEM_POSITION, 'health', False), Spell(self.game, HIDDEN_ITEM_POSITION, 'fire_blast', False)]
         self.inventory_idx = 0
 
     def __repr__(self):
@@ -112,10 +112,10 @@ class Player(pygame.sprite.Sprite):
         if (keys[pygame.K_LEFT] or keys[pygame.K_a]):
             # Deselect 'examine' view in inventory
             self.game.wait_for_up = False
-        if (keys[pygame.K_RIGHT] or keys[pygame.K_d] or keys[pygame.K_RETURN]):
+        elif (keys[pygame.K_RIGHT] or keys[pygame.K_d] or keys[pygame.K_RETURN]):
             # Select 'examine' view in inventory
             self.game.wait_for_up = False
-        if (keys[pygame.K_UP] or keys[pygame.K_w]):
+        elif (keys[pygame.K_UP] or keys[pygame.K_w]):
             # Scroll up in the inventory
             if len(self.player_inventory) > 0 and self.inventory_idx > 0:
                 self.inventory_idx -= 1
@@ -124,7 +124,7 @@ class Player(pygame.sprite.Sprite):
             else:
                 self.inventory_idx = 0
             self.game.wait_for_up = False
-        if (keys[pygame.K_DOWN] or keys[pygame.K_s]):
+        elif (keys[pygame.K_DOWN] or keys[pygame.K_s]):
             # Scroll down in the inventory
             if len(self.player_inventory) > 0 and self.inventory_idx < (len(self.player_inventory) - 1):
                 self.inventory_idx += 1
@@ -133,7 +133,13 @@ class Player(pygame.sprite.Sprite):
             else:
                 self.inventory_idx = 0
             self.game.wait_for_up = False
-        if keys[pygame.K_x]:
+        elif keys[pygame.K_r]:
+            self.player_inventory.pop(self.inventory_idx).drop()
+            self.game.wait_for_up = False
+        elif keys[pygame.K_u]:
+            self.player_inventory[self.inventory_idx].use()
+            self.game.wait_for_up = False
+        elif keys[pygame.K_x]:
             self.game.inventory = False
             self.game.wait_for_up = False
 
@@ -319,15 +325,15 @@ class CastingFlash(pygame.sprite.Sprite):
 
 
 class Item(pygame.sprite.Sprite):
-    def __init__(self, game, position, type, visible=True):
+    def __init__(self, game, position, name, visible=True):
         self._layer = ITEMS_LAYER
         self.groups = game.all_sprites, game.items
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.game = game
-        self.image = self.game.item_images[type]
+        self.image = self.game.item_images[name]
         self.rect = self.image.get_rect()
         self.hit_rect = self.rect
-        self.type = type
+        self.type = name
         self.position = position
         self.rect.center = position
         self.tween = pytweening.easeInOutSine
@@ -344,6 +350,50 @@ class Item(pygame.sprite.Sprite):
             if self.step > BOB_RANGE:
                 self.step = 0
                 self.direction *= -1
+    
+    def pickup(self):
+        self.game.player.player_inventory.append(self)
+        self.visible = False
+        self.position = HIDDEN_ITEM_POSITION
+        self.hit_rect.center = HIDDEN_ITEM_POSITION
+
+    def drop(self):
+        self.visible = True
+        self.position = self.game.player.position + vector(1, 0).rotate(-self.game.player.rotation) * TILESIZE * 2
+        self.hit_rect.center = self.position
+
+    def __repr__(self):
+        return '<Item {} at ({},{})>'.format(self.type, self.position.x, self.position.y)
+
+
+class Potion(Item):
+    def __init__(self, game, position, name, visible=True):
+        Item.__init__(self, game, position, name, visible)
+    
+    def use(self):
+        if self.game.player.health < PLAYER_HEALTH:
+            self.game.effect_sounds['health_up'].play()
+            self.game.player.add_health(HEALTH_PACK_AMOUNT)
+            self.game.player.player_inventory.pop(self.game.player.inventory_idx)
+            self.kill()
+    
+    def __repr__(self):
+        return '<Health Potion {} at ({},{})>'.format(self.type, self.position.x, self.position.y)
+
+
+class Spell(Item):
+    def __init__(self, game, position, name, visible=True):
+        Item.__init__(self, game, position, name, visible)
+    
+    def use(self):
+        if self.game.player.weapon != 'fire_blast':
+            self.game.player.player_inventory.pop(self.game.player.inventory_idx)
+            self.game.effect_sounds['spell_pickup'].play()
+            self.game.player.weapon = 'fire_blast'
+            self.kill()
+    
+    def __repr__(self):
+        return '<Health Potion {} at ({},{})>'.format(self.type, self.position.x, self.position.y)
 
 
 class Npc(pygame.sprite.Sprite):

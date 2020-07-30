@@ -141,6 +141,7 @@ ITEM_IMAGES = {'health': 'HealthPotion.png',
 HEALTH_PACK_AMOUNT = 20
 BOB_RANGE = 15
 BOB_SPEED = 0.4
+HIDDEN_ITEM_POSITION = vector(10000, 10000)
 
 # Sounds
 BACKGROUND_MUSIC = 'Ketsa_-_08_-_Multiverse.mp3'

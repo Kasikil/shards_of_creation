@@ -210,8 +210,10 @@ class Game():
             if tile_object.name == 'wall':
                 Obstacle(self, tile_object.x, tile_object.y, 
                 tile_object.width, tile_object.height)
-            if tile_object.name in ['health', 'fire_blast']:
-                Item(self, obj_center, tile_object.name)
+            if tile_object.name == 'health':
+                Potion(self, obj_center, tile_object.name)
+            if tile_object.name == 'fire_blast':
+                Spell(self, obj_center, tile_object.name)
         self.camera = Camera(self.map.width, self.map.height)
         self.paused = False
         self.night = False
@@ -244,15 +246,7 @@ class Game():
         hits = pygame.sprite.spritecollide(self.player, self.items, False)
         for hit in hits:
             if hit.visible:
-                if hit.type == 'health' and self.player.health < PLAYER_HEALTH:
-                    hit.kill()
-                    self.effect_sounds['health_up'].play()
-                    self.player.add_health(HEALTH_PACK_AMOUNT)
-                if hit.type == 'fire_blast':
-                    hit.kill()
-                    self.effect_sounds['spell_pickup'].play()
-                    self.player.weapon = 'fire_blast'
-
+                hit.pickup()
         # mobs hits player
         hits = pygame.sprite.spritecollide(self.player, self.mobs, False, collide_hit_rect)
         for hit in hits:
