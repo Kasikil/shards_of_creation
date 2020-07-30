@@ -325,6 +325,7 @@ class Npc(pygame.sprite.Sprite):
         self.health = NPCS[identifier]['health']
         self.speed = NPCS[identifier]['speed']
         self.busy = False
+        self.dialogue = NPCS[identifier]['dialogue']
 
         # Waypoint System Initialization
         self.waypoint = False
@@ -375,6 +376,4 @@ class Npc(pygame.sprite.Sprite):
             elif self.waymode == 'sleep' and wait_time >= self.wait_location_time: # Done waiting, onwards to the next point
                 self.target = next(self.waypoints)
                 self.waymode = 'find'
-        if self.busy:
-            self.dialogue = 'Hello!'
 

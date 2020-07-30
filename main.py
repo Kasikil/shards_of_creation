@@ -64,11 +64,11 @@ class Game():
         pygame.display.set_caption(TITLE)
         self.clock = pygame.time.Clock()
         pygame.key.set_repeat(500, 100)
+        self.dialogue_box = pygame.Rect(DIALOGUE_BOX_X, DIALOGUE_BOX_Y, DIALOGUE_BOX_WIDTH, DIALOGUE_BOX_HEIGHT)
         self.load_data()
         self.draw_debug = False
 
-    def draw_text(self, text, font_name, size, color, x, y, align="nw"):
-        font = pygame.font.Font(font_name, size)
+    def draw_text(self, text, font, color, x, y, align="nw"):
         text_surface = font.render(text, True, color)
         text_rect = text_surface.get_rect()
         if align == 'nw':
@@ -109,8 +109,14 @@ class Game():
         self.dialogue = path.join(self.assets_folder, 'dialogue_scripts')
     
     def load_fonts(self):
-        self.title_font = path.join(self.assets_folder, 'ENDOR.TTF')
-        self.hud_font = path.join(self.assets_folder, 'RINGM.TTF')
+        self.title_font_file = path.join(self.assets_folder, 'ENDOR.TTF')
+        self.game_over_font = pygame.font.Font(self.title_font_file, GAME_OVER_FONT_SIZE)
+        self.game_over_sub_font = pygame.font.Font(self.title_font_file, GAME_OVER_SUB_FONT_SIZE)
+        self.pause_font = pygame.font.Font(self.title_font_file, PAUSE_FONT_SIZE)
+        self.hud_font_file = path.join(self.assets_folder, 'RINGM.TTF')
+        self.hud_font = pygame.font.Font(self.hud_font_file, HUD_FONT_SIZE)
+        self.dialogue_font_file = path.join(self.assets_folder, 'arial.TTF')
+        self.dialogue_font = pygame.font.Font(self.dialogue_font_file, DIALOGUE_FONT_SIZE)
     
     def load_dim(self):
         self.dim_screen = pygame.Surface(self.screen.get_size()).convert_alpha()
@@ -268,6 +274,33 @@ class Game():
         self.fog.blit(self.light_mask, self.light_rect)
         self.screen.blit(self.fog, (0, 0), special_flags=pygame.BLEND_MULT)
 
+    def draw_wrapped_text(self, text, font, color, x, y, allowed_width):
+        words = text.split()
+        lines = []
+        while len(words) > 0:
+            line_words = []
+            while len(words) > 0:
+                line_words.append(words.pop(0))
+                fw, fh = font.size(' '.join(line_words + words[:1]))
+                if fw > allowed_width:
+                    break
+            line = ' '.join(line_words)
+            lines.append(line)
+        y_offset = 0
+        for line in lines:
+            fw, fh = font.size(line)
+            ty = DIALOGUE_TEXT_Y + y_offset
+            self.draw_text(line, self.dialogue_font, 
+                           WHITE, DIALOGUE_TEXT_X, ty)
+            y_offset += fh
+
+    def draw_dialogue_box(self):
+        pygame.draw.rect(self.screen, BLACK, self.dialogue_box)
+        pygame.draw.rect(self.screen, WHITE, self.dialogue_box, DIALOGUE_BOX_OUTLINE)
+        if self.player.busy and self.player.conversation_partner:
+            self.draw_wrapped_text(self.player.conversation_partner.dialogue, self.dialogue_font,
+            WHITE, DIALOGUE_TEXT_X, DIALOGUE_TEXT_Y, DIALOGUE_ALLOWED_WIDTH)
+
     def draw(self):
         """
         Draw portion of the game loop
@@ -293,11 +326,13 @@ class Game():
 
         # HUD functions
         draw_player_health(self.screen, 10, 10, self.player.health / PLAYER_HEALTH)
-        # self.draw_text('Shades: {}'.format(len(self.mobs)), self.hud_font, 30, WHITE, 
+        self.draw_dialogue_box()
+
+        # self.draw_text('Shades: {}'.format(len(self.mobs)), self.hud_font, WHITE, 
         #                 WIDTH - 10, 10, align="ne")
         if self.paused:
             self.screen.blit(self.dim_screen, (0, 0))
-            self.draw_text('Paused', self.title_font, 50, RED, WIDTH / 2, HEIGHT / 2, align='center')
+            self.draw_text('Paused', self.pause_font, RED, WIDTH / 2, HEIGHT / 2, align='center')
         # Always last in drawing "flip"
         pygame.display.flip()
 
@@ -321,9 +356,9 @@ class Game():
 
     def show_go_screen(self):
         self.screen.fill(BLACK)
-        self.draw_text('GAME OVER', self.title_font, 100, RED, 
+        self.draw_text('GAME OVER', self.game_over_font, RED, 
                         WIDTH / 2, HEIGHT / 2, align="center")
-        self.draw_text('Press a key to start', self.title_font, 75, WHITE, 
+        self.draw_text('Press a key to start', self.game_over_sub_font, WHITE, 
                         WIDTH / 2, HEIGHT * 3 / 4, align="center")
         pygame.display.flip()
         self.wait_for_key()
