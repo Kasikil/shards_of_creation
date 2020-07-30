@@ -74,7 +74,7 @@ class Player(pygame.sprite.Sprite):
         self.damaged = False
         self.busy = False
         self.conversation_partner = None
-        self.player_inventory = [Item(self.game, vector(0, 0), 'health'), Item(self.game, vector(0, 0), 'fire_blast')]
+        self.player_inventory = [Item(self.game, vector(0, 0), 'health', False), Item(self.game, vector(0, 0), 'fire_blast', False)]
         self.inventory_idx = 0
 
     def __repr__(self):
@@ -107,13 +107,15 @@ class Player(pygame.sprite.Sprite):
             self.conversation_partner = None
 
     def get_keys_inventory(self, keys):
-        if keys[pygame.K_LEFT] or keys[pygame.K_a]:
+        if not self.game.wait_for_up:
+            return
+        if (keys[pygame.K_LEFT] or keys[pygame.K_a]):
             # Deselect 'examine' view in inventory
-            pass
-        if keys[pygame.K_RIGHT] or keys[pygame.K_d] or keys[pygame.K_RETURN]:
+            self.game.wait_for_up = False
+        if (keys[pygame.K_RIGHT] or keys[pygame.K_d] or keys[pygame.K_RETURN]):
             # Select 'examine' view in inventory
-            pass
-        if keys[pygame.K_UP] or keys[pygame.K_w]:
+            self.game.wait_for_up = False
+        if (keys[pygame.K_UP] or keys[pygame.K_w]):
             # Scroll up in the inventory
             if len(self.player_inventory) > 0 and self.inventory_idx > 0:
                 self.inventory_idx -= 1
@@ -121,7 +123,8 @@ class Player(pygame.sprite.Sprite):
                 self.inventory_idx = len(self.player_inventory) - 1
             else:
                 self.inventory_idx = 0
-        if keys[pygame.K_DOWN]or keys[pygame.K_s]:
+            self.game.wait_for_up = False
+        if (keys[pygame.K_DOWN] or keys[pygame.K_s]):
             # Scroll down in the inventory
             if len(self.player_inventory) > 0 and self.inventory_idx < (len(self.player_inventory) - 1):
                 self.inventory_idx += 1
@@ -129,8 +132,10 @@ class Player(pygame.sprite.Sprite):
                 self.inventory_idx = 0
             else:
                 self.inventory_idx = 0
+            self.game.wait_for_up = False
         if keys[pygame.K_x]:
             self.game.inventory = False
+            self.game.wait_for_up = False
 
     def shoot(self):
         now = pygame.time.get_ticks()
@@ -314,7 +319,7 @@ class CastingFlash(pygame.sprite.Sprite):
 
 
 class Item(pygame.sprite.Sprite):
-    def __init__(self, game, position, type):
+    def __init__(self, game, position, type, visible=True):
         self._layer = ITEMS_LAYER
         self.groups = game.all_sprites, game.items
         pygame.sprite.Sprite.__init__(self, self.groups)
@@ -328,15 +333,17 @@ class Item(pygame.sprite.Sprite):
         self.tween = pytweening.easeInOutSine
         self.step = 0
         self.direction = 1
+        self.visible = visible
 
     def update(self):
         # bobbing motion
-        offset = BOB_RANGE * (self.tween(self.step / BOB_RANGE) - 0.5) # -0.5 since we are starting in middle
-        self.rect.centery = self.position.y + offset * self.direction
-        self.step += BOB_SPEED
-        if self.step > BOB_RANGE:
-            self.step = 0
-            self.direction *= -1
+        if self.visible:
+            offset = BOB_RANGE * (self.tween(self.step / BOB_RANGE) - 0.5) # -0.5 since we are starting in middle
+            self.rect.centery = self.position.y + offset * self.direction
+            self.step += BOB_SPEED
+            if self.step > BOB_RANGE:
+                self.step = 0
+                self.direction *= -1
 
 
 class Npc(pygame.sprite.Sprite):

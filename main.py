@@ -64,10 +64,9 @@ class Game():
         pygame.display.set_caption(TITLE)
         self.clock = pygame.time.Clock()
         pygame.key.set_repeat(500, 100)
-        self.dialogue_box = pygame.Rect(DIALOGUE_BOX_X, DIALOGUE_BOX_Y, DIALOGUE_BOX_WIDTH, DIALOGUE_BOX_HEIGHT)
-        self.inventory_box = pygame.Rect(INVENTORY_BOX_X, INVENTORY_BOX_Y, INVENTORY_BOX_WIDTH, INVENTORY_BOX_HEIGHT)
         self.load_data()
         self.draw_debug = False
+        self.wait_for_up = False
 
     def draw_text(self, text, font, color, x, y, align="nw"):
         text_surface = font.render(text, True, color)
@@ -193,7 +192,12 @@ class Game():
         self.map = TiledMap(path.join(self.assets_folder, 'map.tmx'))
         self.map_img = self.map.make_map()
         self.map_rect = self.map_img.get_rect()
-        
+        # Create Boxes Associated With Text Display
+        self.dialogue_box = pygame.Rect(DIALOGUE_BOX_X, DIALOGUE_BOX_Y, DIALOGUE_BOX_WIDTH, DIALOGUE_BOX_HEIGHT)
+        self.inventory_box = pygame.Rect(INVENTORY_BOX_X, INVENTORY_BOX_Y, INVENTORY_BOX_WIDTH, INVENTORY_BOX_HEIGHT)
+        self.inventory_selection_box = pygame.Rect(INVENTORY_BOX_X, INVENTORY_BOX_Y, INVENTORY_ALLOWED_WIDTH, self.inventory_item_font_height)
+
+
         for tile_object in self.map.tmxdata.objects:
             obj_center = vector(tile_object.x + tile_object.width / 2,
                                 tile_object.y + tile_object.height / 2)
@@ -239,14 +243,15 @@ class Game():
         # player hits items
         hits = pygame.sprite.spritecollide(self.player, self.items, False)
         for hit in hits:
-            if hit.type == 'health' and self.player.health < PLAYER_HEALTH:
-                hit.kill()
-                self.effect_sounds['health_up'].play()
-                self.player.add_health(HEALTH_PACK_AMOUNT)
-            if hit.type == 'fire_blast':
-                hit.kill()
-                self.effect_sounds['spell_pickup'].play()
-                self.player.weapon = 'fire_blast'
+            if hit.visible:
+                if hit.type == 'health' and self.player.health < PLAYER_HEALTH:
+                    hit.kill()
+                    self.effect_sounds['health_up'].play()
+                    self.player.add_health(HEALTH_PACK_AMOUNT)
+                if hit.type == 'fire_blast':
+                    hit.kill()
+                    self.effect_sounds['spell_pickup'].play()
+                    self.player.weapon = 'fire_blast'
 
         # mobs hits player
         hits = pygame.sprite.spritecollide(self.player, self.mobs, False, collide_hit_rect)
@@ -281,7 +286,7 @@ class Game():
         self.fog.blit(self.light_mask, self.light_rect)
         self.screen.blit(self.fog, (0, 0), special_flags=pygame.BLEND_MULT)
 
-    def draw_wrapped_text(self, text, font, color, x, y, allowed_width):
+    def draw_wrapped_text(self, text, font, color, x, y, allowed_width, line_spacing):
         words = text.split()
         lines = []
         while len(words) > 0:
@@ -299,23 +304,28 @@ class Game():
             ty = y + y_offset
             self.draw_text(line, font, 
                            color, x, ty)
-            y_offset += fh + 1
+            y_offset += fh + line_spacing
 
     def draw_dialogue_box(self):
         pygame.draw.rect(self.screen, BLACK, self.dialogue_box)
         pygame.draw.rect(self.screen, WHITE, self.dialogue_box, DIALOGUE_BOX_OUTLINE)
         if self.player.busy and self.player.conversation_partner:
             self.draw_wrapped_text(self.player.conversation_partner.dialogue, self.dialogue_font,
-                                   WHITE, DIALOGUE_TEXT_X, DIALOGUE_TEXT_Y, DIALOGUE_ALLOWED_WIDTH)
+                                   WHITE, DIALOGUE_TEXT_X, DIALOGUE_TEXT_Y, DIALOGUE_ALLOWED_WIDTH, DIALOGUE_LINE_SPACING)
 
     def draw_inventory(self):
         pygame.draw.rect(self.screen, BLACK, self.inventory_box)
         pygame.draw.rect(self.screen, WHITE, self.inventory_box, INVENTORY_BOX_OUTLINE)
         inventory_item_y = INVENTORY_TEXT_Y
+        inventory_idx = 0
         for item in self.player.player_inventory:
             self.draw_wrapped_text(item.type, self.inventory_item_font, WHITE, INVENTORY_TEXT_X, 
-                                   inventory_item_y, INVENTORY_ALLOWED_WIDTH)
-            inventory_item_y += self.inventory_item_font_height + 2
+                                   inventory_item_y, INVENTORY_ALLOWED_WIDTH, INVENTORY_LINE_SPACING)
+            if self.player.inventory_idx == inventory_idx:
+                self.inventory_selection_box.topleft = (INVENTORY_TEXT_X - 1, inventory_item_y)
+                pygame.draw.rect(self.screen, WHITE, self.inventory_selection_box, INVENTORY_SELECTION_OUTLINE)
+            inventory_idx += 1
+            inventory_item_y += self.inventory_item_font_height
 
     def draw(self):
         """
@@ -329,6 +339,9 @@ class Game():
         for sprite in self.all_sprites:
             if isinstance(sprite, Mob):
                 sprite.draw_health()
+            if isinstance(sprite, Item):
+                if not sprite.visible:
+                    continue
             self.screen.blit(sprite.image, self.camera.apply(sprite))
             if self.draw_debug:
                 pygame.draw.rect(self.screen, CYAN, self.camera.apply_rect(sprite.hit_rect), 1)
@@ -364,6 +377,8 @@ class Game():
             # Check for closing the window *x*
             if event.type == pygame.QUIT:
                 self.quit()
+            if event.type == pygame.KEYUP:
+                self.wait_for_up = True
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     self.quit()
