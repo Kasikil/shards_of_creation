@@ -33,7 +33,7 @@ try:
 except ImportError as err:
     print ('Couldn\'t load module. {}'.format(err))
     sys.exit(2)
-    
+
 
 class Game():
     """
@@ -185,7 +185,6 @@ class Game():
         self.inventory_box = pygame.Rect(INVENTORY_BOX_X, INVENTORY_BOX_Y, INVENTORY_BOX_WIDTH, INVENTORY_BOX_HEIGHT)
         self.inventory_selection_box = pygame.Rect(INVENTORY_BOX_X, INVENTORY_BOX_Y, INVENTORY_ALLOWED_WIDTH, self.inventory_item_font_height)
 
-
         for tile_object in self.map.tmxdata.objects:
             obj_center = vector(tile_object.x + tile_object.width / 2,
                                 tile_object.y + tile_object.height / 2)
@@ -304,10 +303,13 @@ class Game():
             self.draw_wrapped_text(item.type, self.inventory_item_font, WHITE, INVENTORY_TEXT_X, 
                                    inventory_item_y, INVENTORY_ALLOWED_WIDTH, INVENTORY_LINE_SPACING)
             if self.player.inventory_idx == inventory_idx:
-                self.inventory_selection_box.topleft = (INVENTORY_TEXT_X - 1, inventory_item_y)
+                self.inventory_selection_box.topleft = (INVENTORY_BOX_X + INVENTORY_BOX_OUTLINE + 1, inventory_item_y)
                 pygame.draw.rect(self.screen, WHITE, self.inventory_selection_box, INVENTORY_SELECTION_OUTLINE)
             inventory_idx += 1
             inventory_item_y += self.inventory_item_font_height
+        if len(self.player.player_inventory) > 0:
+            self.screen.blit(self.player.player_inventory[self.player.inventory_idx].image, vector(INVENTORY_IMAGE_X, INVENTORY_IMAGE_Y))
+        pygame.draw.line(self.screen, WHITE, vector(WIDTH / 2, INVENTORY_BOX_Y), vector(WIDTH / 2, INVENTORY_BOX_Y + INVENTORY_BOX_HEIGHT), INVENTORY_BOX_OUTLINE)
 
     def draw(self):
         """

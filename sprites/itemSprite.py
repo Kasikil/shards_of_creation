@@ -65,6 +65,13 @@ class Item(pygame.sprite.Sprite):
         self.visible = True
         self.position = self.game.player.position + vector(1, 0).rotate(-self.game.player.rotation) * TILESIZE * 2
         self.hit_rect.center = self.position
+        self.change_inventory_idx()
+
+    def change_inventory_idx(self):
+        if (self.game.player.inventory_idx - 1) < 0:
+            self.game.player.inventory_idx = 0
+        else:
+            self.game.player.inventory_idx -= 1 
 
     def __repr__(self):
         return '<Item {} at ({},{})>'.format(self.type, self.position.x, self.position.y)
@@ -79,6 +86,7 @@ class Potion(Item):
             self.game.effect_sounds['health_up'].play()
             self.game.player.add_health(HEALTH_PACK_AMOUNT)
             self.game.player.player_inventory.pop(self.game.player.inventory_idx)
+            self.change_inventory_idx()               
             self.kill()
     
     def __repr__(self):
@@ -92,6 +100,7 @@ class Spell(Item):
     def use(self):
         if self.game.player.weapon != 'fire_blast':
             self.game.player.player_inventory.pop(self.game.player.inventory_idx)
+            self.change_inventory_idx()
             self.game.effect_sounds['spell_pickup'].play()
             self.game.player.weapon = 'fire_blast'
             self.kill()
