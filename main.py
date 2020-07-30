@@ -21,7 +21,8 @@ try:
     import sys
 
     # Non-Standard Imports
-    from settings import *
+    from settings.settings import *
+    from settings.npc_settings import *
     from sprites import *
     from tilemap import *
 except ImportError as err:
@@ -63,11 +64,11 @@ class Game():
         pygame.display.set_caption(TITLE)
         self.clock = pygame.time.Clock()
         pygame.key.set_repeat(500, 100)
+        self.dialogue_box = pygame.Rect(DIALOGUE_BOX_X, DIALOGUE_BOX_Y, DIALOGUE_BOX_WIDTH, DIALOGUE_BOX_HEIGHT)
         self.load_data()
         self.draw_debug = False
 
-    def draw_text(self, text, font_name, size, color, x, y, align="nw"):
-        font = pygame.font.Font(font_name, size)
+    def draw_text(self, text, font, color, x, y, align="nw"):
         text_surface = font.render(text, True, color)
         text_rect = text_surface.get_rect()
         if align == 'nw':
@@ -91,28 +92,54 @@ class Game():
         self.screen.blit(text_surface, text_rect)
 
     def load_data(self):
-        game_folder = path.dirname(__file__)
-        img_folder = path.join(game_folder, 'img')
-        sound_folder = path.join(game_folder, 'sound')
-        music_folder = path.join(game_folder, 'music')
-        self.assets_folder = path.join(game_folder, 'assets')
-        self.title_font = path.join(self.assets_folder, 'ENDOR.TTF')
-        self.hud_font = path.join(self.assets_folder, 'RINGM.TTF')
+        self.load_folders()
+        self.load_fonts()
+        self.load_dim()
+        self.load_images()
+        self.load_sound()
+        self.load_dialogue()
+
+    def load_folders(self):
+        self.game_folder = path.dirname(__file__)
+        self.assets_folder = path.join(self.game_folder, 'assets')
+        self.img_folder = path.join(self.game_folder, 'img')
+        self.npc_img_folder = path.join(self.img_folder, 'npcs')
+        self.sound_folder = path.join(self.game_folder, 'sound')
+        self.music_folder = path.join(self.game_folder, 'music')
+        self.dialogue = path.join(self.assets_folder, 'dialogue_scripts')
+    
+    def load_fonts(self):
+        self.title_font_file = path.join(self.assets_folder, 'ENDOR.TTF')
+        self.game_over_font = pygame.font.Font(self.title_font_file, GAME_OVER_FONT_SIZE)
+        self.game_over_sub_font = pygame.font.Font(self.title_font_file, GAME_OVER_SUB_FONT_SIZE)
+        self.pause_font = pygame.font.Font(self.title_font_file, PAUSE_FONT_SIZE)
+        self.hud_font_file = path.join(self.assets_folder, 'RINGM.TTF')
+        self.hud_font = pygame.font.Font(self.hud_font_file, HUD_FONT_SIZE)
+        self.dialogue_font_file = path.join(self.assets_folder, 'arial.TTF')
+        self.dialogue_font = pygame.font.Font(self.dialogue_font_file, DIALOGUE_FONT_SIZE)
+    
+    def load_dim(self):
         self.dim_screen = pygame.Surface(self.screen.get_size()).convert_alpha()
         self.dim_screen.fill((0, 0, 0, 180))
-        self.player_img = pygame.image.load(path.join(img_folder, PLAYER_IMG)).convert_alpha()
+
+    def load_images(self):
+        self.player_img = pygame.image.load(path.join(self.img_folder, PLAYER_IMG)).convert_alpha()
         self.projectile_images = {}
-        self.projectile_images['lg'] = pygame.image.load(path.join(img_folder, PROJECTILE_IMG)).convert_alpha()
+        self.projectile_images['lg'] = pygame.image.load(path.join(self.img_folder, PROJECTILE_IMG)).convert_alpha()
         self.projectile_images['sm'] = pygame.transform.scale(self.projectile_images['lg'], (10, 10))
-        self.mob_img = pygame.image.load(path.join(img_folder, MOB_IMG)).convert_alpha()
-        self.splat = pygame.image.load(path.join(img_folder, MOB_SPLAT)).convert_alpha()
+        self.mob_img = pygame.image.load(path.join(self.img_folder, MOB_IMG)).convert_alpha()
+        self.splat = pygame.image.load(path.join(self.img_folder, MOB_SPLAT)).convert_alpha()
         self.splat = pygame.transform.scale(self.splat, (TILESIZE, TILESIZE))
         self.casting_flashes = []
         for img in CASTING_FLASH:
-            self.casting_flashes.append(pygame.image.load(path.join(img_folder, img)).convert_alpha())
+            self.casting_flashes.append(pygame.image.load(path.join(self.img_folder, img)).convert_alpha())
         self.item_images = {}
         for item in ITEM_IMAGES:
-            self.item_images[item] = pygame.image.load(path.join(img_folder, ITEM_IMAGES[item])).convert_alpha()
+            self.item_images[item] = pygame.image.load(path.join(self.img_folder, ITEM_IMAGES[item])).convert_alpha()
+        self.npc_images = {}
+        for npc in NPCS:
+            self.npc_images[NPCS[npc]['name']] = pygame.image.load(path.join(self.npc_img_folder, NPCS[npc]['image'])).convert_alpha()
+        
         # lighting effect
         self.fog = pygame.Surface((WIDTH, HEIGHT))
         self.fog.fill(NIGHT_COLOR)
@@ -120,29 +147,33 @@ class Game():
         self.light_mask = pygame.transform.scale(self.light_mask, LIGHT_RADIUS)
         self.light_rect = self.light_mask.get_rect()
 
+    def load_sound(self):
         # Sound Loading
-        pygame.mixer.music.load(path.join(music_folder, BACKGROUND_MUSIC))
+        pygame.mixer.music.load(path.join(self.music_folder, BACKGROUND_MUSIC))
         self.effect_sounds = {}
         for type in EFFECTS_SOUNDS:
-            self.effect_sounds[type] = pygame.mixer.Sound(path.join(sound_folder, EFFECTS_SOUNDS[type]))
+            self.effect_sounds[type] = pygame.mixer.Sound(path.join(self.sound_folder, EFFECTS_SOUNDS[type]))
         self.weapon_sounds = {}
         for casting in CASTING_SOUNDS:
             self.weapon_sounds[casting] = []
             for sound in CASTING_SOUNDS[casting]:
-                s = pygame.mixer.Sound(path.join(sound_folder, sound))
+                s = pygame.mixer.Sound(path.join(self.sound_folder, sound))
                 s.set_volume(0.3)
                 self.weapon_sounds[casting].append(s)
         self.mob_standard_sounds = []
         for sound in MOB_STANDARD_SOUNDS:
-            s = pygame.mixer.Sound(path.join(sound_folder, sound))
+            s = pygame.mixer.Sound(path.join(self.sound_folder, sound))
             s.set_volume(1) # Range of 1 - full original to 0 - mute
             self.mob_standard_sounds.append(s)
         self.player_hit_sounds = []
         for sound in PLAYER_HIT_SOUNDS:
-            self.player_hit_sounds.append(pygame.mixer.Sound(path.join(sound_folder, sound)))
+            self.player_hit_sounds.append(pygame.mixer.Sound(path.join(self.sound_folder, sound)))
         self.mob_hit_sounds = []
         for sound in MOB_HIT_SOUNDS:
-            self.mob_hit_sounds.append(pygame.mixer.Sound(path.join(sound_folder, sound)))
+            self.mob_hit_sounds.append(pygame.mixer.Sound(path.join(self.sound_folder, sound)))
+
+    def load_dialogue(self):
+        pass
 
     def new(self):
         """
@@ -153,6 +184,7 @@ class Game():
         self.mobs = pygame.sprite.Group()
         self.projectiles = pygame.sprite.Group()
         self.items = pygame.sprite.Group()
+        self.npcs = pygame.sprite.Group()
 
         self.map = TiledMap(path.join(self.assets_folder, 'map.tmx'))
         self.map_img = self.map.make_map()
@@ -165,6 +197,8 @@ class Game():
                 self.player = Player(self, obj_center.x, obj_center.y)
             if tile_object.name == 'mob':
                 Mob(self, obj_center.x, obj_center.y)
+            if tile_object.name == 'npc':
+                Npc(self, obj_center.x, obj_center.y, tile_object.type)
             if tile_object.name == 'wall':
                 Obstacle(self, tile_object.x, tile_object.y, 
                 tile_object.width, tile_object.height)
@@ -195,9 +229,6 @@ class Game():
         """
         self.all_sprites.update()
         self.camera.update(self.player)
-        # game over?
-        if len(self.mobs) == 0:
-            self.playing = False
         # player hits items
         hits = pygame.sprite.spritecollide(self.player, self.items, False)
         for hit in hits:
@@ -222,6 +253,7 @@ class Game():
         if hits:
             self.player.hit()
             self.player.position += vector(MOB_KNOCKBACK, 0).rotate(-hits[0].rotation)
+
         # projectiles hit mobs
         hits = pygame.sprite.groupcollide(self.mobs, self.projectiles, False, True)
         for mob in hits:
@@ -241,6 +273,33 @@ class Game():
         self.light_rect.center = self.camera.apply(self.player).center
         self.fog.blit(self.light_mask, self.light_rect)
         self.screen.blit(self.fog, (0, 0), special_flags=pygame.BLEND_MULT)
+
+    def draw_wrapped_text(self, text, font, color, x, y, allowed_width):
+        words = text.split()
+        lines = []
+        while len(words) > 0:
+            line_words = []
+            while len(words) > 0:
+                line_words.append(words.pop(0))
+                fw, fh = font.size(' '.join(line_words + words[:1]))
+                if fw > allowed_width:
+                    break
+            line = ' '.join(line_words)
+            lines.append(line)
+        y_offset = 0
+        for line in lines:
+            fw, fh = font.size(line)
+            ty = DIALOGUE_TEXT_Y + y_offset
+            self.draw_text(line, self.dialogue_font, 
+                           WHITE, DIALOGUE_TEXT_X, ty)
+            y_offset += fh
+
+    def draw_dialogue_box(self):
+        pygame.draw.rect(self.screen, BLACK, self.dialogue_box)
+        pygame.draw.rect(self.screen, WHITE, self.dialogue_box, DIALOGUE_BOX_OUTLINE)
+        if self.player.busy and self.player.conversation_partner:
+            self.draw_wrapped_text(self.player.conversation_partner.dialogue, self.dialogue_font,
+            WHITE, DIALOGUE_TEXT_X, DIALOGUE_TEXT_Y, DIALOGUE_ALLOWED_WIDTH)
 
     def draw(self):
         """
@@ -267,11 +326,13 @@ class Game():
 
         # HUD functions
         draw_player_health(self.screen, 10, 10, self.player.health / PLAYER_HEALTH)
-        self.draw_text('Shades: {}'.format(len(self.mobs)), self.hud_font, 30, WHITE, 
-                        WIDTH - 10, 10, align="ne")
+        self.draw_dialogue_box()
+
+        # self.draw_text('Shades: {}'.format(len(self.mobs)), self.hud_font, WHITE, 
+        #                 WIDTH - 10, 10, align="ne")
         if self.paused:
             self.screen.blit(self.dim_screen, (0, 0))
-            self.draw_text('Paused', self.title_font, 50, RED, WIDTH / 2, HEIGHT / 2, align='center')
+            self.draw_text('Paused', self.pause_font, RED, WIDTH / 2, HEIGHT / 2, align='center')
         # Always last in drawing "flip"
         pygame.display.flip()
 
@@ -295,9 +356,9 @@ class Game():
 
     def show_go_screen(self):
         self.screen.fill(BLACK)
-        self.draw_text('GAME OVER', self.title_font, 100, RED, 
+        self.draw_text('GAME OVER', self.game_over_font, RED, 
                         WIDTH / 2, HEIGHT / 2, align="center")
-        self.draw_text('Press a key to start', self.title_font, 75, WHITE, 
+        self.draw_text('Press a key to start', self.game_over_sub_font, WHITE, 
                         WIDTH / 2, HEIGHT * 3 / 4, align="center")
         pygame.display.flip()
         self.wait_for_key()
