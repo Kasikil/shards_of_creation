@@ -309,7 +309,12 @@ class Game():
             inventory_item_y += self.inventory_item_font_height
         if len(self.player.player_inventory) > 0:
             self.screen.blit(self.player.player_inventory[self.player.inventory_idx].image, vector(INVENTORY_IMAGE_X, INVENTORY_IMAGE_Y))
+            self.draw_wrapped_text(self.player.player_inventory[self.player.inventory_idx].details, 
+                                   self.dialogue_font, WHITE, INVENTORY_IMAGE_X - INVENTORY_BOX_OUTLINE * 3, 
+                                   INVENTORY_IMAGE_Y + TILESIZE + INVENTORY_LINE_SPACING, 
+                                   INVENTORY_ALLOWED_WIDTH, INVENTORY_LINE_SPACING)
         pygame.draw.line(self.screen, WHITE, vector(WIDTH / 2, INVENTORY_BOX_Y), vector(WIDTH / 2, INVENTORY_BOX_Y + INVENTORY_BOX_HEIGHT), INVENTORY_BOX_OUTLINE)
+        
 
     def draw(self):
         """

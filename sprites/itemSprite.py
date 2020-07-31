@@ -44,6 +44,7 @@ class Item(pygame.sprite.Sprite):
         self.step = 0
         self.direction = 1
         self.visible = visible
+        self.details = 'This is a test string to prove you can see it and also long enough to word wrap it.'
 
     def update(self):
         # bobbing motion
