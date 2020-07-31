@@ -125,8 +125,10 @@ class Game():
         for img in CASTING_FLASH:
             self.casting_flashes.append(pygame.image.load(path.join(self.img_folder, img)).convert_alpha())
         self.item_images = {}
-        for item in ITEM_IMAGES:
-            self.item_images[item] = pygame.image.load(path.join(self.img_folder, ITEM_IMAGES[item])).convert_alpha()
+        for item in POTION_ITEMS:
+            self.item_images[item] = pygame.image.load(path.join(self.img_folder, POTION_ITEMS[item]['image'])).convert_alpha()
+        for item in SPELL_ITEMS:
+            self.item_images[item] = pygame.image.load(path.join(self.img_folder, SPELL_ITEMS[item]['image'])).convert_alpha()
         self.npc_images = {}
         for npc in NPCS:
             self.npc_images[NPCS[npc]['name']] = pygame.image.load(path.join(self.npc_img_folder, NPCS[npc]['image'])).convert_alpha()
@@ -142,8 +144,8 @@ class Game():
         # Sound Loading
         pygame.mixer.music.load(path.join(self.music_folder, BACKGROUND_MUSIC))
         self.effect_sounds = {}
-        for type in EFFECTS_SOUNDS:
-            self.effect_sounds[type] = pygame.mixer.Sound(path.join(self.sound_folder, EFFECTS_SOUNDS[type]))
+        for sounds in EFFECTS_SOUNDS:
+            self.effect_sounds[sounds] = pygame.mixer.Sound(path.join(self.sound_folder, EFFECTS_SOUNDS[sounds]))
         self.weapon_sounds = {}
         for casting in CASTING_SOUNDS:
             self.weapon_sounds[casting] = []
@@ -197,9 +199,9 @@ class Game():
             if tile_object.name == 'wall':
                 Obstacle(self, tile_object.x, tile_object.y, 
                 tile_object.width, tile_object.height)
-            if tile_object.name == 'health':
+            if tile_object.name in POTION_ITEMS:
                 Potion(self, obj_center, tile_object.name)
-            if tile_object.name == 'fire_blast':
+            if tile_object.name in SPELL_ITEMS:
                 Spell(self, obj_center, tile_object.name)
         self.camera = Camera(self.map.width, self.map.height)
         self.paused = False
@@ -310,9 +312,9 @@ class Game():
         if len(self.player.player_inventory) > 0:
             self.screen.blit(self.player.player_inventory[self.player.inventory_idx].image, vector(INVENTORY_IMAGE_X, INVENTORY_IMAGE_Y))
             self.draw_wrapped_text(self.player.player_inventory[self.player.inventory_idx].details, 
-                                   self.dialogue_font, WHITE, INVENTORY_IMAGE_X - INVENTORY_BOX_OUTLINE * 3, 
+                                   self.dialogue_font, WHITE, int(INVENTORY_IMAGE_X - INVENTORY_BOX_OUTLINE * 4), 
                                    INVENTORY_IMAGE_Y + TILESIZE + INVENTORY_LINE_SPACING, 
-                                   INVENTORY_ALLOWED_WIDTH, INVENTORY_LINE_SPACING)
+                                   INVENTORY_ALLOWED_WIDTH - INVENTORY_BOX_OUTLINE, INVENTORY_LINE_SPACING)
         pygame.draw.line(self.screen, WHITE, vector(WIDTH / 2, INVENTORY_BOX_Y), vector(WIDTH / 2, INVENTORY_BOX_Y + INVENTORY_BOX_HEIGHT), INVENTORY_BOX_OUTLINE)
         
 
