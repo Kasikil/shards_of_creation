@@ -137,9 +137,19 @@ PROJECTILE_LAYER = 3
 EFFECTS_LAYER = 4
 
 # Items
-ITEM_IMAGES = {'health': 'HealthPotion.png',
-               'fire_blast': 'FireSpell.png'}
-HEALTH_PACK_AMOUNT = 20
+POTION_ITEMS = {}
+POTION_ITEMS['health_potion_01'] = {'image': 'HealthPotion.png',
+                                    'name': 'Standard Health Potion',
+                                    'details': 'This potion will restore 20 points of health when used. It has a single use and then will disappear. This potion cannot be used when health is already full.',
+                                    'health_value': 20}
+POTION_ITEMS['health_potion_02'] = {'image': 'HealthPotion.png',
+                                    'name': 'Moderate Health Potion',
+                                    'details': 'This potion will restore 40 points of health when used. It has a single use and then will disappear. This potion cannot be used when health is already full.',
+                                    'health_value': 40}
+SPELL_ITEMS = {}
+SPELL_ITEMS['fire_blast_01'] = {'image': 'FireSpell.png',
+                                'name': 'Fire Blast',
+                                'details': 'Activating this spell will cause a fire spray to originate when you cast. More damage will be done cumilatively, but each spell projectile will cause less damage. This spell cannot be used if your current spell is already set to fire spell.'}
 BOB_RANGE = 15
 BOB_SPEED = 0.4
 HIDDEN_ITEM_POSITION = vector(10000, 10000)

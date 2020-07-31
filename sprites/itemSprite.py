@@ -29,12 +29,12 @@ vector = pygame.math.Vector2
 
 
 class Item(pygame.sprite.Sprite):
-    def __init__(self, game, position, name, visible=True):
+    def __init__(self, game, position, image_key, name, visible=True):
         self._layer = ITEMS_LAYER
         self.groups = game.all_sprites, game.items
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.game = game
-        self.image = self.game.item_images[name]
+        self.image = self.game.item_images[image_key]
         self.rect = self.image.get_rect()
         self.hit_rect = self.rect
         self.type = name
@@ -44,6 +44,7 @@ class Item(pygame.sprite.Sprite):
         self.step = 0
         self.direction = 1
         self.visible = visible
+        self.details = 'This is a test string to prove you can see it and also long enough to word wrap it.'
 
     def update(self):
         # bobbing motion
@@ -79,12 +80,14 @@ class Item(pygame.sprite.Sprite):
 
 class Potion(Item):
     def __init__(self, game, position, name, visible=True):
-        Item.__init__(self, game, position, name, visible)
+        Item.__init__(self, game, position, name, POTION_ITEMS[name]['name'], visible)
+        self.details = POTION_ITEMS[name]['details']
+        self.health_amount = POTION_ITEMS[name]['health_value']
     
     def use(self):
         if self.game.player.health < PLAYER_HEALTH:
             self.game.effect_sounds['health_up'].play()
-            self.game.player.add_health(HEALTH_PACK_AMOUNT)
+            self.game.player.add_health(self.health_amount)
             self.game.player.player_inventory.pop(self.game.player.inventory_idx)
             self.change_inventory_idx()               
             self.kill()
@@ -95,7 +98,8 @@ class Potion(Item):
 
 class Spell(Item):
     def __init__(self, game, position, name, visible=True):
-        Item.__init__(self, game, position, name, visible)
+        Item.__init__(self, game, position, name, SPELL_ITEMS[name]['name'], visible)
+        self.details = SPELL_ITEMS[name]['details']
     
     def use(self):
         if self.game.player.weapon != 'fire_blast':

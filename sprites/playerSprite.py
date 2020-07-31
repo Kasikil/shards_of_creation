@@ -55,7 +55,8 @@ class Player(pygame.sprite.Sprite):
         self.damaged = False
         self.busy = False
         self.conversation_partner = None
-        self.player_inventory = [Potion(self.game, HIDDEN_ITEM_POSITION, 'health', False), Spell(self.game, HIDDEN_ITEM_POSITION, 'fire_blast', False)]
+        self.player_inventory = [Potion(self.game, HIDDEN_ITEM_POSITION, 'health_potion_01', False),
+                                 Spell(self.game, HIDDEN_ITEM_POSITION, 'fire_blast_01', False)]
         self.inventory_idx = 0
 
     def __repr__(self):
