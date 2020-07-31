@@ -184,6 +184,7 @@ class Game():
         self.map_rect = self.map_img.get_rect()
         # Create Boxes Associated With Text Display
         self.dialogue_box = pygame.Rect(DIALOGUE_BOX_X, DIALOGUE_BOX_Y, DIALOGUE_BOX_WIDTH, DIALOGUE_BOX_HEIGHT)
+        self.inventory_tab = pygame.Rect(INVENTORY_BOX_X, INVENTORY_BOX_Y - self.inventory_item_font_height - INVENTORY_BOX_OUTLINE, INVENTORY_BOX_WIDTH, self.inventory_item_font_height)
         self.inventory_box = pygame.Rect(INVENTORY_BOX_X, INVENTORY_BOX_Y, INVENTORY_BOX_WIDTH, INVENTORY_BOX_HEIGHT)
         self.inventory_selection_box = pygame.Rect(INVENTORY_BOX_X, INVENTORY_BOX_Y, INVENTORY_ALLOWED_WIDTH, self.inventory_item_font_height)
 
@@ -299,6 +300,9 @@ class Game():
     def draw_inventory(self):
         pygame.draw.rect(self.screen, BLACK, self.inventory_box)
         pygame.draw.rect(self.screen, WHITE, self.inventory_box, INVENTORY_BOX_OUTLINE)
+        pygame.draw.rect(self.screen, BLACK, self.inventory_tab)
+        pygame.draw.rect(self.screen, WHITE, self.inventory_tab, INVENTORY_BOX_OUTLINE)
+        self.draw_text('Inventory', self.inventory_item_font, WHITE, self.inventory_tab.x + INVENTORY_BOX_OUTLINE, self.inventory_tab.y)
         inventory_item_y = INVENTORY_TEXT_Y
         inventory_idx = 0
         for item in self.player.player_inventory:
@@ -316,7 +320,6 @@ class Game():
                                    INVENTORY_IMAGE_Y + TILESIZE + INVENTORY_LINE_SPACING, 
                                    INVENTORY_ALLOWED_WIDTH - INVENTORY_BOX_OUTLINE, INVENTORY_LINE_SPACING)
         pygame.draw.line(self.screen, WHITE, vector(WIDTH / 2, INVENTORY_BOX_Y), vector(WIDTH / 2, INVENTORY_BOX_Y + INVENTORY_BOX_HEIGHT), INVENTORY_BOX_OUTLINE)
-        
 
     def draw(self):
         """

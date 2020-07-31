@@ -142,6 +142,10 @@ POTION_ITEMS['health_potion_01'] = {'image': 'HealthPotion.png',
                                     'name': 'Standard Health Potion',
                                     'details': 'This potion will restore 20 points of health when used. It has a single use and then will disappear. This potion cannot be used when health is already full.',
                                     'health_value': 20}
+POTION_ITEMS['health_potion_02'] = {'image': 'HealthPotion.png',
+                                    'name': 'Moderate Health Potion',
+                                    'details': 'This potion will restore 40 points of health when used. It has a single use and then will disappear. This potion cannot be used when health is already full.',
+                                    'health_value': 40}
 SPELL_ITEMS = {}
 SPELL_ITEMS['fire_blast_01'] = {'image': 'FireSpell.png',
                                 'name': 'Fire Blast',
