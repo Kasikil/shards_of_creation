@@ -1,17 +1,24 @@
-Welcome to Shards of Creation!
+Welcome to [Untitled Game]]!
+
+Required Development Software: Python 3.7.3
+
+Setup:
+1. In the root directory of this repository, create a virtual environment from the command line/terminal:
+    python -m venv venv
+2. Activate the venv in the terminal/command line:
+    venv\Scripts\activate
+3. Install current requirements in your local vevn by running the following command from the command line*:
+    python -m pip install -r requirements.txt
+
+Please note, if during development you install any additional python dependencies, you must update the requirements.txt. The easiest way to accomplish this will be by running the following command from a command line/terminal with an activated virtual enviornment:
+python -m pip freeze > requirements.txt
 
 Starting the game:
-Go to the venv\Scripts\activate.bat file (on Windows) and edit the following line:
-    set "VIRTUAL_ENV=C:\Users\clayt\py\shards_of_creation\venv"
-to be the absolute path to your venv folder
-
-With the changes saved, from the root directory (the folder where this file is located), enter the following command in a command prompt:
+1. Activate the venv in the terminal/command line:
     venv\Scripts\activate
-
-Verify that the path in your command prompt is now prefixed with:
-(venv)
-
-The game can now be ran by running the command:
+2. Verify that the path in your command prompt is now prefixed with:
+    (venv)
+3. The game can now be ran by running the command:
     python main.py
 
 
