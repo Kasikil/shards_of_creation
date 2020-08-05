@@ -1,7 +1,7 @@
 ####################################################################
 #
 #
-# Shards of Creation -- settings.settings --
+# [Untitled Game] -- settings.settings --
 # A Fantasy Narrative RPG
 # Liscense Here
 #
@@ -34,7 +34,7 @@ CYAN = (0, 255, 255)
 WIDTH = 1024 # 16 * 64 or 32 * 32 or 64 * 16
 HEIGHT = 512 # 16 * 32 or 32 * 16 or 64 * 8
 FPS = 60
-TITLE = 'Shards of Creation'
+TITLE = '[Untitled Game]'
 BGCOLOR = BROWN
 
 TILESIZE = 32

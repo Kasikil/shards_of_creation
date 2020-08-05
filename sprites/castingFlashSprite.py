@@ -1,7 +1,7 @@
 ####################################################################
 #
 #
-# Shards of Creation -- sprites.castingFlashSprite --
+# [Untitled Game] -- sprites.castingFlashSprite --
 # A Fantasy Narrative RPG
 # Liscense Here
 #

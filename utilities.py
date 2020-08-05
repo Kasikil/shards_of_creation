@@ -1,7 +1,7 @@
 ####################################################################
 #
 #
-# Shards of Creation -- utilities --
+# [Untitled Game] -- utilities --
 # A Fantasy Narrative RPG
 # Liscense Here
 #

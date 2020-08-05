@@ -1,7 +1,7 @@
 ####################################################################
 #
 #
-# Shards of Creation -- settings.npc_settings --
+# [Untitled Game] -- settings.npc_settings --
 # A Fantasy Narrative RPG
 # Liscense Here
 #
