@@ -1,19 +1,33 @@
-Welcome to [Untitled Game]]!
+# Welcome to [Untitled Game]]!
 
 Required Development Software: Python 3.7.3
 
-Setup:
+## Setup:
 1. In the root directory of this repository, create a virtual environment from the command line/terminal:
 > python -m venv venv
 2. Activate the venv in the terminal/command line:
 > venv\Scripts\activate
-3. Install current requirements in your local vevn by running the following command from the command line*:
+3. Verify that the path in your command prompt is now prefixed with:
+> (venv)
+4. Install current requirements in your local vevn by running the following command from the command line*:
 > python -m pip install -r requirements.txt
 
-Please note, if during development you install any additional python dependencies, you must update the requirements.txt. The easiest way to accomplish this will be by running the following command from a command line/terminal with an activated virtual enviornment:
+\*Please note, if during development you install any additional python dependencies, you must update the requirements.txt. The easiest way to accomplish this will be by running the following command from a command line/terminal with an activated virtual enviornment:
 python -m pip freeze > requirements.txt
 
-Starting the game:
+## Making a release:
+1. Activate the venv in the terminal/command line:
+> venv\Scripts\activate
+2. Verify that the path in your command prompt is now prefixed with:
+> (venv)
+3. Run the make_a_release.bat script from the command line
+> make_a_release.bat
+4. Go into the dist folder, select all the contents, and on the right-click context menu, select "Send To > Compressed (zipped) Folder"
+4. Move the release *.zip to another loaction
+5. Clean up the release process:
+> clean_up_release.bat
+
+## Starting the game:
 1. Activate the venv in the terminal/command line:
 > venv\Scripts\activate
 2. Verify that the path in your command prompt is now prefixed with:
@@ -21,6 +35,7 @@ Starting the game:
 3. The game can now be ran by running the command:
 > python main.py
 
+# Controls
 
 General Controls:
 * Esc         - Quit
