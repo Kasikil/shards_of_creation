@@ -1,4 +1,4 @@
-# Welcome to [Untitled Game]]!
+# Welcome to Shards of Creation]!
 
 Required Development Software: Python 3.7.3
 

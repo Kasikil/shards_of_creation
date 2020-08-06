@@ -1,7 +1,7 @@
 ####################################################################
 #
 #
-# [Untitled Game] -- sprites.projectileSprite --
+# Shards of Creation -- sprites.projectileSprite --
 # A Fantasy Narrative RPG
 # Liscense Here
 #
