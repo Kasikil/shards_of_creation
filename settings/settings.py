@@ -116,7 +116,7 @@ PLAYER_HEALTH = 100
 PLAYER_SPEED = 300
 PLAYER_ROTATION_SPEED = 250 # degress/second
 PLAYER_IMG = 'player.png'
-PLAYER_HIT_RECT = pygame.Rect(0, 0, 30, 30)
+PLAYER_HIT_RECT = pygame.Rect(0, 0, 25, 25)
 PROJECTILE_LAUNCH_OFFSET = vector(15, 5)
 
 # Effects

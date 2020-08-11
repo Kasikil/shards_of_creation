@@ -179,7 +179,7 @@ class Game():
         self.items = pygame.sprite.Group()
         self.npcs = pygame.sprite.Group()
 
-        self.map = TiledMap(path.join(self.assets_folder, 'map.tmx'))
+        self.map = TiledMap(path.join(self.assets_folder, 'monestary.tmx'))
         self.map_img = self.map.make_map()
         self.map_rect = self.map_img.get_rect()
         # Create Boxes Associated With Text Display
