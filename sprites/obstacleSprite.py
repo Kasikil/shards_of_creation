@@ -59,6 +59,9 @@ class Portal(pygame.sprite.Sprite):
         self.next_rotation = MAP_PORTALS[self.game.current_map][self.location].rotation
 
     def update_map(self):
+        # Load Screen
+        self.game.draw_load_screen()
+
         # Cullling the previous map
         for item in self.game.items:
             if item not in self.game.player.player_inventory:

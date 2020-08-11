@@ -118,6 +118,9 @@ class Game():
 
     def load_images(self):
         self.player_img = pygame.image.load(path.join(self.img_folder, PLAYER_IMG)).convert_alpha()
+        self.logo_image = pygame.image.load(path.join(self.img_folder, LOGO_IMG)).convert_alpha()
+        self.logo_rect = self.logo_image.get_rect()
+        self.logo_rect.center = (WIDTH / 2, HEIGHT / 2)
         self.projectile_images = {}
         self.projectile_images['lg'] = pygame.image.load(path.join(self.img_folder, PROJECTILE_IMG)).convert_alpha()
         self.projectile_images['sm'] = pygame.transform.scale(self.projectile_images['lg'], (10, 10))
@@ -293,6 +296,12 @@ class Game():
         self.light_rect.center = self.camera.apply(self.player).center
         self.fog.blit(self.light_mask, self.light_rect)
         self.screen.blit(self.fog, (0, 0), special_flags=pygame.BLEND_MULT)
+
+    def draw_load_screen(self):
+        self.fog.fill(BLACK)
+        self.screen.blit(self.fog, (0, 0))
+        self.screen.blit(self.logo_image, self.logo_rect)
+        pygame.display.flip()
 
     def draw_wrapped_text(self, text, font, color, x, y, allowed_width, line_spacing):
         words = text.split()
