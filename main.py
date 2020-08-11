@@ -22,11 +22,12 @@ try:
 
     # Non-Standard Imports
     from settings.settings import *
+    from settings.map_links import *
     from settings.npc_settings import *
     from sprites.itemSprite import Item, Potion, Spell
     from sprites.mobSprite import Mob
     from sprites.npcSprite import Npc
-    from sprites.obstacleSprite import Obstacle
+    from sprites.obstacleSprite import Obstacle, Portal
     from sprites.playerSprite import Player
     from tilemap import *
     from utilities import draw_player_health
@@ -53,6 +54,7 @@ class Game():
         self.clock = pygame.time.Clock()
         pygame.key.set_repeat(500, 100)
         self.load_data()
+        self.map = None
         self.draw_debug = False
         self.wait_for_up = False
 
@@ -90,6 +92,7 @@ class Game():
     def load_folders(self):
         self.game_folder = path.dirname(__file__)
         self.assets_folder = path.join(self.game_folder, 'assets')
+        self.maps_folder = path.join(self.assets_folder, 'maps')
         self.img_folder = path.join(self.game_folder, 'img')
         self.npc_img_folder = path.join(self.img_folder, 'npcs')
         self.sound_folder = path.join(self.game_folder, 'sound')
@@ -172,27 +175,39 @@ class Game():
         """
         Initializes all variables and do all the setup for a new game
         """
+        # Instantiate Sprite Groups
         self.all_sprites = pygame.sprite.LayeredUpdates()
         self.walls = pygame.sprite.Group()
+        self.portals = pygame.sprite.Group()
         self.mobs = pygame.sprite.Group()
         self.projectiles = pygame.sprite.Group()
         self.items = pygame.sprite.Group()
         self.npcs = pygame.sprite.Group()
 
-        self.map = TiledMap(path.join(self.assets_folder, 'monestary.tmx'))
-        self.map_img = self.map.make_map()
-        self.map_rect = self.map_img.get_rect()
         # Create Boxes Associated With Text Display
         self.dialogue_box = pygame.Rect(DIALOGUE_BOX_X, DIALOGUE_BOX_Y, DIALOGUE_BOX_WIDTH, DIALOGUE_BOX_HEIGHT)
         self.inventory_tab = pygame.Rect(INVENTORY_BOX_X, INVENTORY_BOX_Y - self.inventory_item_font_height - INVENTORY_BOX_OUTLINE, INVENTORY_BOX_WIDTH, self.inventory_item_font_height)
         self.inventory_box = pygame.Rect(INVENTORY_BOX_X, INVENTORY_BOX_Y, INVENTORY_BOX_WIDTH, INVENTORY_BOX_HEIGHT)
         self.inventory_selection_box = pygame.Rect(INVENTORY_BOX_X, INVENTORY_BOX_Y, INVENTORY_ALLOWED_WIDTH, self.inventory_item_font_height)
 
+        self.switch_map()
+
+
+    def switch_map(self, map_name='monestary', spawn=True):
+        """
+        Switches to input map
+        """
+        self.current_map = map_name
+        self.map = TiledMap(path.join(self.maps_folder, '{}.tmx'.format(map_name)))
+        self.map_img = self.map.make_map()
+        self.map_rect = self.map_img.get_rect()
+
         for tile_object in self.map.tmxdata.objects:
             obj_center = vector(tile_object.x + tile_object.width / 2,
                                 tile_object.y + tile_object.height / 2)
             if tile_object.name == 'player':
-                self.player = Player(self, obj_center.x, obj_center.y)
+                if spawn:
+                    self.player = Player(self, obj_center.x, obj_center.y)
             if tile_object.name == 'mob':
                 Mob(self, obj_center.x, obj_center.y)
             if tile_object.name == 'npc':
@@ -200,6 +215,9 @@ class Game():
             if tile_object.name == 'wall':
                 Obstacle(self, tile_object.x, tile_object.y, 
                 tile_object.width, tile_object.height)
+            if tile_object.name == 'portal':
+                Portal(self, obj_center.x, obj_center.y, 
+                tile_object.width, tile_object.height, tile_object.type)
             if tile_object.name in POTION_ITEMS:
                 Potion(self, obj_center, tile_object.name)
             if tile_object.name in SPELL_ITEMS:
@@ -256,6 +274,12 @@ class Game():
             for projectile in hits[mob]:
                 mob.health -= projectile.damage
             mob.velocity = vector(0, 0)
+        
+        # player hits portal
+        hits = pygame.sprite.spritecollide(self.player, self.portals, False)
+        for hit in hits:
+            hit.update_map()
+            break
 
     def draw_grid(self):
         for x in range(0, WIDTH, TILESIZE):
@@ -342,6 +366,8 @@ class Game():
         if self.draw_debug:
             for wall in self.walls:
                 pygame.draw.rect(self.screen, CYAN, self.camera.apply_rect(wall.rect), 1)
+            for portal in self.portals:
+                pygame.draw.rect(self.screen, CYAN, self.camera.apply_rect(portal.rect), 1)
 
         # pygame.draw.rect(self.screen, WHITE, self.player.hit_rect, 2)
         if self.night:

@@ -176,6 +176,12 @@ class Player(pygame.sprite.Sprite):
         if self.health > PLAYER_HEALTH:
             self.health = PLAYER_HEALTH
 
+    def new_map(self, x, y):
+        self.rect.center = (x, y)
+        self.hit_rect.center = self.rect.center
+        self.velocity = vector(0, 0)
+        self.position = vector(x, y)
+
 
 
 
