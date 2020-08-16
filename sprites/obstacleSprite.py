@@ -42,6 +42,17 @@ class Obstacle(pygame.sprite.Sprite):
         self.rect.y = y
 
 
+class Spawn(pygame.sprite.Sprite):
+    def __init__(self, game, x, y, name):
+        self._layer = WALL_LAYER
+        self.groups = game.spawns
+        pygame.sprite.Sprite.__init__(self, self.groups)
+        self.name = name
+        self.game = game
+        self.x = x
+        self.y = y
+
+
 class Portal(pygame.sprite.Sprite):
     def __init__(self, game, x, y, width, height, key):
         self._layer = WALL_LAYER
@@ -55,7 +66,7 @@ class Portal(pygame.sprite.Sprite):
         self.rect.x = x
         self.rect.y = y
         self.next_map = MAP_PORTALS[self.game.current_map][self.location].next_map
-        self.next_position = MAP_PORTALS[self.game.current_map][self.location].position
+        self.spawn_object = MAP_PORTALS[self.game.current_map][self.location].spawn_object
         self.next_rotation = MAP_PORTALS[self.game.current_map][self.location].rotation
 
     def update_map(self):
@@ -68,6 +79,8 @@ class Portal(pygame.sprite.Sprite):
                 item.kill()
         for wall in self.game.walls:
             wall.kill()
+        for spawn in self.game.spawns:
+            spawn.kill()
         for portal in self.game.portals:
             if portal != self:
                 portal.kill()
@@ -79,11 +92,12 @@ class Portal(pygame.sprite.Sprite):
             npc.kill()
         self.game.camera = None
 
+        # Map Updates
+        self.game.switch_map(self.next_map, False)
+
         # Player Updates
         if self.next_rotation:
             self.game.player.rotation = self.next_rotation
-        self.game.player.new_map(self.next_position.x, self.next_position.y)
-
-        # Map Updates
-        self.game.switch_map(self.next_map, False)
+        self.game.player.new_map(self.spawn_object)
+        
         self.kill()

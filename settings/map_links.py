@@ -11,9 +11,6 @@
 try:
     # Standard Python Imports
     import pygame
-
-    # Non-Standard Imports
-    from settings.settings import TILESIZE
 except ImportError as err:
     print ('Couldn\'t load module. {}'.format(err))
     raise
@@ -21,22 +18,22 @@ except ImportError as err:
 vector = pygame.math.Vector2
 
 class Link():
-    def __init__(self, next_map, position_x, position_y, rotation=None):
+    def __init__(self, next_map, spawn_object, rotation=None):
         self.next_map = next_map
-        self.position = vector(position_x * TILESIZE, position_y * TILESIZE)
+        self.spawn_object = spawn_object
         self.rotation = rotation
 
     def __repr__(self):
-        return '<Link to {} at ({},{})>'.format(self.next_map, self.position.x, self.position.y)
+        return '<Link to map: {} \nat spawn location{}>'.format(self.next_map, self.spawn_object)
 
 
 MAP_PORTALS = {
     'monestary': {
-        'front_door': Link('world_000001', 25, 25),
-        'garden_door': Link('world_000001', 40, 40)
+        'front_door': Link('world_000001', 'monestary_front_door'),
+        'garden_door': Link('world_000001', 'monestary_garden_door')
     },
     'world_000001': {
-        'monestary_front_door': Link('monestary', 262.5, 818.5),  # Assuming rect.center
-        'monestary_garden_door': Link('monestary', 293.5, 792.5)  # Assuming rect.center
+        'monestary_front_door': Link('monestary', 'front_door'),
+        'monestary_garden_door': Link('monestary', 'garden_door')
     }
 }

@@ -13,9 +13,10 @@ try:
     import os
     import pygame
     import pytmx
+    import pyscroll
 
     # Non-Standard Imports
-    from settings.settings import *
+    from settings.settings import HEIGHT, WIDTH
 except ImportError as err:
     print ('Couldn\'t load module. {}'.format(err))
     raise

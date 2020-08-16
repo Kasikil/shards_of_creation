@@ -16,6 +16,8 @@ try:
     from os import path
     import pygame    
     from pygame.locals import *
+    import pyscroll
+    import pytmx
     from random import choice, random
     from socket import *
     import sys
@@ -27,7 +29,7 @@ try:
     from sprites.itemSprite import Item, Potion, Spell
     from sprites.mobSprite import Mob
     from sprites.npcSprite import Npc
-    from sprites.obstacleSprite import Obstacle, Portal
+    from sprites.obstacleSprite import Obstacle, Portal, Spawn
     from sprites.playerSprite import Player
     from tilemap import *
     from utilities import draw_player_health
@@ -179,9 +181,9 @@ class Game():
         Initializes all variables and do all the setup for a new game
         """
         # Instantiate Sprite Groups
-        self.all_sprites = pygame.sprite.LayeredUpdates()
         self.walls = pygame.sprite.Group()
         self.portals = pygame.sprite.Group()
+        self.spawns = pygame.sprite.Group()
         self.mobs = pygame.sprite.Group()
         self.projectiles = pygame.sprite.Group()
         self.items = pygame.sprite.Group()
@@ -201,11 +203,15 @@ class Game():
         Switches to input map
         """
         self.current_map = map_name
-        self.map = TiledMap(path.join(self.maps_folder, '{}.tmx'.format(map_name)))
-        self.map_img = self.map.make_map()
-        self.map_rect = self.map_img.get_rect()
-
-        for tile_object in self.map.tmxdata.objects:
+        # Pyscroll
+        tm = pytmx.load_pygame(path.join(self.maps_folder, '{}.tmx'.format(map_name)), pixelalpha=True)
+        self.map_data = pyscroll.TiledMapData(tm)
+        screen_size = (WIDTH, HEIGHT)
+        self.map_layer = pyscroll.BufferedRenderer(self.map_data, screen_size)
+        # Instantiate all_sprites group
+        self.all_sprites = pyscroll.PyscrollGroup(map_layer=self.map_layer)
+        
+        for tile_object in tm.objects:
             obj_center = vector(tile_object.x + tile_object.width / 2,
                                 tile_object.y + tile_object.height / 2)
             if tile_object.name == 'player':
@@ -221,11 +227,12 @@ class Game():
             if tile_object.name == 'portal':
                 Portal(self, obj_center.x, obj_center.y, 
                 tile_object.width, tile_object.height, tile_object.type)
+            if tile_object.name == 'spawn':
+                Spawn(self, obj_center.x, obj_center.y, tile_object.type)
             if tile_object.name in POTION_ITEMS:
                 Potion(self, obj_center, tile_object.name)
             if tile_object.name in SPELL_ITEMS:
                 Spell(self, obj_center, tile_object.name)
-        self.camera = Camera(self.map.width, self.map.height)
         self.paused = False
         self.night = False
         self.inventory = False
@@ -251,8 +258,8 @@ class Game():
         """
         Update portion of the game loop
         """
-        self.all_sprites.update()
-        self.camera.update(self.player)
+        self.all_sprites.update()        
+        self.all_sprites.center(self.player.rect.center)
         # player hits items
         hits = pygame.sprite.spritecollide(self.player, self.items, False)
         for hit in hits:
@@ -293,7 +300,7 @@ class Game():
     def render_fog(self):
         # draw the light mask (gradient) onto fog image
         self.fog.fill(NIGHT_COLOR)
-        self.light_rect.center = self.camera.apply(self.player).center
+        self.light_rect.center = self.player.rect.center
         self.fog.blit(self.light_mask, self.light_rect)
         self.screen.blit(self.fog, (0, 0), special_flags=pygame.BLEND_MULT)
 
@@ -361,22 +368,18 @@ class Game():
         if DEBUG:
             pygame.display.set_caption("{:.2f}".format(self.clock.get_fps()))
         # self.screen.fill(BGCOLOR)
-        self.screen.blit(self.map_img, self.camera.apply_rect(self.map_rect))
+        self.all_sprites.draw(self.screen)
         # self.draw_grid()
         for sprite in self.all_sprites:
             if isinstance(sprite, Mob):
                 sprite.draw_health()
-            if isinstance(sprite, Item):
-                if not sprite.visible:
-                    continue
-            self.screen.blit(sprite.image, self.camera.apply(sprite))
             if self.draw_debug:
-                pygame.draw.rect(self.screen, CYAN, self.camera.apply_rect(sprite.hit_rect), 1)
+                pygame.draw.rect(self.screen, CYAN, sprite.hit_rect, 1)
         if self.draw_debug:
             for wall in self.walls:
-                pygame.draw.rect(self.screen, CYAN, self.camera.apply_rect(wall.rect), 1)
+                pygame.draw.rect(self.screen, CYAN, wall.rect, 1)
             for portal in self.portals:
-                pygame.draw.rect(self.screen, CYAN, self.camera.apply_rect(portal.rect), 1)
+                pygame.draw.rect(self.screen, CYAN, portal.rect, 1)
 
         # pygame.draw.rect(self.screen, WHITE, self.player.hit_rect, 2)
         if self.night:
