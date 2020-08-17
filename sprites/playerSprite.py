@@ -60,7 +60,7 @@ class Player(pygame.sprite.Sprite):
         self.inventory_idx = 0
 
     def __repr__(self):
-        return '<Player Current Weapon {}>'.format(self.weapon)
+        return '<Player Current Position ({}, {})>'.format(self.position.x, self.position.y)
 
     def get_keys(self):
         self.rotation_speed = 0
