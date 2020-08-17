@@ -123,6 +123,9 @@ class Game():
         self.logo_image = pygame.image.load(path.join(self.img_folder, LOGO_IMG)).convert_alpha()
         self.logo_rect = self.logo_image.get_rect()
         self.logo_rect.center = (WIDTH / 2, HEIGHT / 2)
+        self.compass_img = pygame.image.load(path.join(self.img_folder, COMPASS)).convert_alpha()
+        self.compass_img_rect = self.compass_img.get_rect()
+        self.compass_img_rect.center = (WIDTH - self.compass_img_rect.width/2 , self.compass_img_rect.height / 2)
         self.projectile_images = {}
         self.projectile_images['lg'] = pygame.image.load(path.join(self.img_folder, PROJECTILE_IMG)).convert_alpha()
         self.projectile_images['sm'] = pygame.transform.scale(self.projectile_images['lg'], (10, 10))
@@ -340,6 +343,9 @@ class Game():
             self.draw_wrapped_text(self.player.conversation_partner.dialogue, self.dialogue_font,
                                    WHITE, DIALOGUE_TEXT_X, DIALOGUE_TEXT_Y, DIALOGUE_ALLOWED_WIDTH, DIALOGUE_LINE_SPACING)
 
+    def draw_compass(self):
+        self.screen.blit(self.compass_img, self.compass_img_rect)
+
     def draw_inventory(self):
         pygame.draw.rect(self.screen, BLACK, self.inventory_box)
         pygame.draw.rect(self.screen, WHITE, self.inventory_box, INVENTORY_BOX_OUTLINE)
@@ -400,6 +406,9 @@ class Game():
         # Draw inventory
         if self.inventory:
             self.draw_inventory()
+
+            # Draw Compass
+            self.draw_compass()
 
         # Paused
         if self.paused:

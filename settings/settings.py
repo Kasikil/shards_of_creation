@@ -36,6 +36,7 @@ HEIGHT = 512 # 16 * 32 or 32 * 16 or 64 * 8
 FPS = 60
 TITLE = 'Shards of Creation'
 LOGO_IMG = 'logo.png'
+COMPASS = 'Compass.png'
 BGCOLOR = BROWN
 
 TILESIZE = 32
