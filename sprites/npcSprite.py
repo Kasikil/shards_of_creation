@@ -95,7 +95,6 @@ class Npc(pygame.sprite.Sprite):
                 self.time_waiting = self.game.dt
             elif self.waymode == 'sleep' and self.time_waiting < self.wait_location_time: # Waiting
                 self.time_waiting += self.game.dt
-                print(self.time_waiting)
             elif self.waymode == 'sleep' and self.time_waiting >= self.wait_location_time: # Done waiting, onwards to the next point
                 self.target = next(self.waypoints)
                 self.waymode = 'find'
