@@ -74,7 +74,6 @@ class Npc(pygame.sprite.Sprite):
     def update(self):
         if self.waypoint and not self.busy:
             target_distance = (self.target - self.position)
-            wait_time = pygame.time.get_ticks() - self.time_waiting
             if self.waymode == 'find' and target_distance.length_squared() != 0: # Not there yet, time to move
                 self.rotation = target_distance.angle_to(vector(1, 0))
                 self.rect = self.image.get_rect()
@@ -93,9 +92,10 @@ class Npc(pygame.sprite.Sprite):
             elif self.waymode == 'find' and target_distance.length_squared() == 0: # NPC is there, time to wait
                 self.waymode = 'sleep'
                 self.wait_location_time = next(self.waysleep)
-                self.time_waiting = pygame.time.get_ticks()
-            elif self.waymode == 'sleep' and wait_time < self.wait_location_time: # Waiting
-                pass
-            elif self.waymode == 'sleep' and wait_time >= self.wait_location_time: # Done waiting, onwards to the next point
+                self.time_waiting = self.game.dt
+            elif self.waymode == 'sleep' and self.time_waiting < self.wait_location_time: # Waiting
+                self.time_waiting += self.game.dt
+                print(self.time_waiting)
+            elif self.waymode == 'sleep' and self.time_waiting >= self.wait_location_time: # Done waiting, onwards to the next point
                 self.target = next(self.waypoints)
                 self.waymode = 'find'
