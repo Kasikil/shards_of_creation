@@ -25,6 +25,6 @@ NPCS['Zuan'] = {'name': 'Zuan',
                 'movement_method': 'waypoint',
                 'speed': 100,
                 'waypoint_system': 'relative', # relative or absolute
-                'waypoints': [[0, 128], [224, 128], [224, 0], [0, 0]],
-                'waysleep': [4000],
+                'waypoints': [[0, 128], [224, 128], [224, 0], [0, 0]], # in pixels
+                'waysleep': [4], # in seconds
                 'dialogue': 'Hello there! My name is Zuan, and I am your creator.'}
