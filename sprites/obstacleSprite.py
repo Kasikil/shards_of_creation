@@ -43,7 +43,7 @@ class Obstacle(pygame.sprite.Sprite):
 
 
 class Spawn(pygame.sprite.Sprite):
-    def __init__(self, game, x, y, name):
+    def __init__(self, game, x, y, width, height, name):
         self._layer = WALL_LAYER
         self.groups = game.spawns
         pygame.sprite.Sprite.__init__(self, self.groups)
@@ -51,7 +51,8 @@ class Spawn(pygame.sprite.Sprite):
         self.game = game
         self.x = x
         self.y = y
-
+        self.rect = pygame.Rect(x, y, width, height)
+        self.rect.center = (x, y)
 
 class Portal(pygame.sprite.Sprite):
     def __init__(self, game, x, y, width, height, key):
@@ -63,8 +64,7 @@ class Portal(pygame.sprite.Sprite):
         self.rect = pygame.Rect(x, y, width, height)
         self.x = x
         self.y = y
-        self.rect.x = x
-        self.rect.y = y
+        self.rect.center = (x, y)
         self.next_map = MAP_PORTALS[self.game.current_map][self.location].next_map
         self.spawn_object = MAP_PORTALS[self.game.current_map][self.location].spawn_object
         self.next_rotation = MAP_PORTALS[self.game.current_map][self.location].rotation
@@ -99,5 +99,4 @@ class Portal(pygame.sprite.Sprite):
         if self.next_rotation:
             self.game.player.rotation = self.next_rotation
         self.game.player.new_map(self.spawn_object)
-        
         self.kill()

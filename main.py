@@ -217,6 +217,8 @@ class Game():
             if tile_object.name == 'player':
                 if spawn:
                     self.player = Player(self, obj_center.x, obj_center.y)
+            elif not spawn:
+                self.all_sprites.add(self.player)
             if tile_object.name == 'mob':
                 Mob(self, obj_center.x, obj_center.y)
             if tile_object.name == 'npc':
@@ -228,7 +230,8 @@ class Game():
                 Portal(self, obj_center.x, obj_center.y, 
                 tile_object.width, tile_object.height, tile_object.type)
             if tile_object.name == 'spawn':
-                Spawn(self, obj_center.x, obj_center.y, tile_object.type)
+                Spawn(self, obj_center.x, obj_center.y, 
+                tile_object.width, tile_object.height, tile_object.type)
             if tile_object.name in POTION_ITEMS:
                 Potion(self, obj_center, tile_object.name)
             if tile_object.name in SPELL_ITEMS:
@@ -300,7 +303,7 @@ class Game():
     def render_fog(self):
         # draw the light mask (gradient) onto fog image
         self.fog.fill(NIGHT_COLOR)
-        self.light_rect.center = self.player.rect.center
+        self.light_rect.center = self.map_layer.translate_rect(self.player.rect).center 
         self.fog.blit(self.light_mask, self.light_rect)
         self.screen.blit(self.fog, (0, 0), special_flags=pygame.BLEND_MULT)
 
@@ -374,12 +377,14 @@ class Game():
             if isinstance(sprite, Mob):
                 sprite.draw_health()
             if self.draw_debug:
-                pygame.draw.rect(self.screen, CYAN, sprite.hit_rect, 1)
+                pygame.draw.rect(self.screen, CYAN, self.map_layer.translate_rect(sprite.hit_rect), 1)
         if self.draw_debug:
             for wall in self.walls:
-                pygame.draw.rect(self.screen, CYAN, wall.rect, 1)
+                pygame.draw.rect(self.screen, CYAN, self.map_layer.translate_rect(wall.rect), 1)
             for portal in self.portals:
-                pygame.draw.rect(self.screen, CYAN, portal.rect, 1)
+                pygame.draw.rect(self.screen, RED, self.map_layer.translate_rect(portal.rect), 1)
+            for spawn in self.spawns:
+                pygame.draw.rect(self.screen, YELLOW, self.map_layer.translate_rect(spawn.rect), 1)
 
         # pygame.draw.rect(self.screen, WHITE, self.player.hit_rect, 2)
         if self.night:
