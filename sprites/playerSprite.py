@@ -176,6 +176,17 @@ class Player(pygame.sprite.Sprite):
         if self.health > PLAYER_HEALTH:
             self.health = PLAYER_HEALTH
 
+    def new_map(self, spawn_key):
+        """
+        This method should only be called after a new map and its objects have been populated.
+        """
+        for spawn in self.game.spawns:
+            if spawn.name == spawn_key:
+                self.rect.center = (spawn.x, spawn.y)
+                self.position = vector(spawn.x, spawn.y)
+        self.hit_rect.center = self.rect.center
+        self.velocity = vector(0, 0)
+
 
 
 
