@@ -23,6 +23,7 @@ try:
     import sys
 
     # Non-Standard Imports
+    from dialogue_scripts.dialogue import *
     from settings.settings import *
     from settings.map_links import *
     from settings.npc_settings import *
@@ -110,6 +111,8 @@ class Game():
         self.hud_font = pygame.font.Font(self.hud_font_file, HUD_FONT_SIZE)
         self.dialogue_font_file = path.join(self.assets_folder, 'arial.TTF')
         self.dialogue_font = pygame.font.Font(self.dialogue_font_file, DIALOGUE_FONT_SIZE)
+        fw, fh = self.dialogue_font.size('Dialogue')
+        self.dialogue_font_height = fh
         self.inventory_item_font = pygame.font.Font(self.dialogue_font_file, INVENTORY_FONT_SIZE)
         fw, fh = self.inventory_item_font.size('Inventory')
         self.inventory_item_font_height = fh
@@ -199,7 +202,6 @@ class Game():
         self.inventory_selection_box = pygame.Rect(INVENTORY_BOX_X, INVENTORY_BOX_Y, INVENTORY_ALLOWED_WIDTH, self.inventory_item_font_height)
 
         self.switch_map()
-
 
     def switch_map(self, map_name='monestary', spawn=True):
         """
@@ -291,6 +293,14 @@ class Game():
                 mob.health -= projectile.damage
             mob.velocity = vector(0, 0)
         
+        # player hits npc
+        hits = pygame.sprite.spritecollide(self.player, self.npcs, False, collide_hit_rect)
+        if hits:
+            if not hits[0].busy:
+                hits[0].colliding = True
+            else:
+                hits[0].colliding = False
+      
         # player hits portal
         hits = pygame.sprite.spritecollide(self.player, self.portals, False)
         for hit in hits:
@@ -340,8 +350,12 @@ class Game():
         pygame.draw.rect(self.screen, BLACK, self.dialogue_box)
         pygame.draw.rect(self.screen, WHITE, self.dialogue_box, DIALOGUE_BOX_OUTLINE)
         if self.player.busy and self.player.conversation_partner:
-            self.draw_wrapped_text(self.player.conversation_partner.dialogue, self.dialogue_font,
-                                   WHITE, DIALOGUE_TEXT_X, DIALOGUE_TEXT_Y, DIALOGUE_ALLOWED_WIDTH, DIALOGUE_LINE_SPACING)
+            dialogue_text_y = DIALOGUE_TEXT_Y
+            for dialogue_piece in self.player.conversation_partner.dialogue_text:
+                self.draw_wrapped_text(dialogue_piece, self.dialogue_font,
+                                       self.player.conversation_partner.dialogue_color, DIALOGUE_TEXT_X, dialogue_text_y, 
+                                       DIALOGUE_ALLOWED_WIDTH, DIALOGUE_LINE_SPACING)
+                dialogue_text_y += self.dialogue_font_height
 
     def draw_compass(self):
         self.screen.blit(self.compass_img, self.compass_img_rect)
@@ -382,6 +396,8 @@ class Game():
         for sprite in self.all_sprites:
             if isinstance(sprite, Mob):
                 sprite.draw_health()
+            if isinstance(sprite, Npc):
+                sprite.draw_talk()
             if self.draw_debug:
                 pygame.draw.rect(self.screen, CYAN, self.map_layer.translate_rect(sprite.hit_rect), 1)
         if self.draw_debug:

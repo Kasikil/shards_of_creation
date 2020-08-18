@@ -15,9 +15,11 @@ try:
     import pygame
     import pytweening
     from random import choice, randint, random, uniform
+    import re
     import sys
 
     # Non-Standard Imports
+    from dialogue_scripts.dialogue import DIALOGUE
     from settings.settings import *
     from settings.npc_settings import *
     from tilemap import collide_hit_rect
@@ -48,6 +50,8 @@ class Npc(pygame.sprite.Sprite):
         self.health = NPCS[identifier]['health']
         self.speed = NPCS[identifier]['speed']
         self.busy = False
+        self.colliding = False
+        self.init_dialogue = NPCS[identifier]['dialogue'] 
         self.dialogue = NPCS[identifier]['dialogue']
 
         # Waypoint System Initialization
@@ -71,7 +75,37 @@ class Npc(pygame.sprite.Sprite):
     def __repr__(self):
         return '<NPC {} at ({},{})>'.format(self.name, self.position.x, self.position.y)
 
+    def current_dialogue(self, idx=0):
+        if (idx + 1) > len(DIALOGUE[self.dialogue]['next']):
+            # prevents user from causing an error by selecting one of the other talking options
+            return
+        if 'update' in DIALOGUE[self.dialogue]:
+            setattr(self.game.player, DIALOGUE[self.dialogue]['update']['update_field'], DIALOGUE[self.dialogue]['update']['options'][idx])
+        self.dialogue = DIALOGUE[self.dialogue]['next'][idx]
+        self.set_dialogue()
+
+    def set_init_dialogue(self):
+        self.dialogue = self.init_dialogue
+        self.set_dialogue()
+
+    def set_dialogue(self):
+        dialogue_text = '{}: {}'.format(DIALOGUE[self.dialogue]['speaker'], DIALOGUE[self.dialogue]['dialogue'])
+        dialogue_text = dialogue_text.replace('[name]', self.game.player.name)
+        self.dialogue_text = dialogue_text.split('\n')
+        self.dialogue_color = DIALOGUE[self.dialogue]['color']
+        # (Possibly) Change color of text in DIALOGUE dictionary once it has been read once by the player
+        
+    def draw_talk(self):
+        if self.colliding:
+            x_y = self.game.map_layer.translate_point((self.rect.x, self.rect.y))
+            self.game.draw_text('Talk \'t\' to {}'.format(self.name), 
+                                self.game.dialogue_font, WHITE, 
+                                x_y[0], x_y[1])
+
     def update(self):
+        # Visual portion
+        self.colliding = False
+        # Waypoint
         if self.waypoint and not self.busy:
             target_distance = (self.target - self.position)
             if self.waymode == 'find' and target_distance.length_squared() != 0: # Not there yet, time to move

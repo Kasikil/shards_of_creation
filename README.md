@@ -1,6 +1,8 @@
 # Welcome to Shards of Creation!
 
-Required Development Software: Python 3.7.3
+Required Development Software: 
+> Python 3.7.3 (https://www.python.org/downloads/)
+> Tiled (https://www.mapeditor.org/)
 
 ## Setup:
 1. In the root directory of this repository, create a virtual environment from the command line/terminal:
