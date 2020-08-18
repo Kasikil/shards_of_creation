@@ -161,6 +161,7 @@ class Player(pygame.sprite.Sprite):
             hits[0].busy = True
             self.busy = True
             self.conversation_partner = hits[0]
+            self.conversation_partner.set_init_dialogue()
 
     def hit(self):
         self.damaged = True

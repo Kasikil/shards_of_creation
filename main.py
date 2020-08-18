@@ -111,6 +111,8 @@ class Game():
         self.hud_font = pygame.font.Font(self.hud_font_file, HUD_FONT_SIZE)
         self.dialogue_font_file = path.join(self.assets_folder, 'arial.TTF')
         self.dialogue_font = pygame.font.Font(self.dialogue_font_file, DIALOGUE_FONT_SIZE)
+        fw, fh = self.dialogue_font.size('Dialogue')
+        self.dialogue_font_height = fh
         self.inventory_item_font = pygame.font.Font(self.dialogue_font_file, INVENTORY_FONT_SIZE)
         fw, fh = self.inventory_item_font.size('Inventory')
         self.inventory_item_font_height = fh
@@ -340,9 +342,12 @@ class Game():
         pygame.draw.rect(self.screen, BLACK, self.dialogue_box)
         pygame.draw.rect(self.screen, WHITE, self.dialogue_box, DIALOGUE_BOX_OUTLINE)
         if self.player.busy and self.player.conversation_partner:
-            self.draw_wrapped_text(self.player.conversation_partner.dialogue_text, self.dialogue_font,
-                                   self.player.conversation_partner.dialogue_color, DIALOGUE_TEXT_X, DIALOGUE_TEXT_Y, 
-                                   DIALOGUE_ALLOWED_WIDTH, DIALOGUE_LINE_SPACING)
+            dialogue_text_y = DIALOGUE_TEXT_Y
+            for dialogue_piece in self.player.conversation_partner.dialogue_text:
+                self.draw_wrapped_text(dialogue_piece, self.dialogue_font,
+                                       self.player.conversation_partner.dialogue_color, DIALOGUE_TEXT_X, dialogue_text_y, 
+                                       DIALOGUE_ALLOWED_WIDTH, DIALOGUE_LINE_SPACING)
+                dialogue_text_y += self.dialogue_font_height
 
     def draw_compass(self):
         self.screen.blit(self.compass_img, self.compass_img_rect)

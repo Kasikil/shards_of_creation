@@ -50,8 +50,8 @@ class Npc(pygame.sprite.Sprite):
         self.health = NPCS[identifier]['health']
         self.speed = NPCS[identifier]['speed']
         self.busy = False
+        self.init_dialogue = NPCS[identifier]['dialogue'] 
         self.dialogue = NPCS[identifier]['dialogue']
-        self.current_dialogue()
 
         # Waypoint System Initialization
         self.waypoint = False
@@ -76,14 +76,24 @@ class Npc(pygame.sprite.Sprite):
 
     def current_dialogue(self, idx=0):
         if (idx + 1) > len(DIALOGUE[self.dialogue]['next']):
+            # prevents user from causing an error by selecting one of the other talking options
             return
         if 'update' in DIALOGUE[self.dialogue]:
             setattr(self.game.player, DIALOGUE[self.dialogue]['update']['update_field'], DIALOGUE[self.dialogue]['update']['options'][idx])
         self.dialogue = DIALOGUE[self.dialogue]['next'][idx]
-        self.dialogue_text = DIALOGUE[self.dialogue]['dialogue']
-        self.dialogue_text.replace('[name]', self.game.player.name)
-        self.dialogue_color = DIALOGUE[self.dialogue]['color']
+        self.set_dialogue()
 
+    def set_init_dialogue(self):
+        self.dialogue = self.init_dialogue
+        self.set_dialogue()
+
+    def set_dialogue(self):
+        dialogue_text = '{}: {}'.format(DIALOGUE[self.dialogue]['speaker'], DIALOGUE[self.dialogue]['dialogue'])
+        dialogue_text = dialogue_text.replace('[name]', self.game.player.name)
+        self.dialogue_text = dialogue_text.split('\n')
+        self.dialogue_color = DIALOGUE[self.dialogue]['color']
+        # (Possibly) Change color of text in DIALOGUE dictionary once it has been read once by the player
+        
     def update(self):
         if self.waypoint and not self.busy:
             target_distance = (self.target - self.position)
