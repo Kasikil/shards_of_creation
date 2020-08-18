@@ -50,6 +50,7 @@ class Npc(pygame.sprite.Sprite):
         self.health = NPCS[identifier]['health']
         self.speed = NPCS[identifier]['speed']
         self.busy = False
+        self.colliding = False
         self.init_dialogue = NPCS[identifier]['dialogue'] 
         self.dialogue = NPCS[identifier]['dialogue']
 
@@ -94,7 +95,17 @@ class Npc(pygame.sprite.Sprite):
         self.dialogue_color = DIALOGUE[self.dialogue]['color']
         # (Possibly) Change color of text in DIALOGUE dictionary once it has been read once by the player
         
+    def draw_talk(self):
+        if self.colliding:
+            x_y = self.game.map_layer.translate_point((self.rect.x, self.rect.y))
+            self.game.draw_text('Talk \'t\' to {}'.format(self.name), 
+                                self.game.dialogue_font, WHITE, 
+                                x_y[0], x_y[1])
+
     def update(self):
+        # Visual portion
+        self.colliding = False
+        # Waypoint
         if self.waypoint and not self.busy:
             target_distance = (self.target - self.position)
             if self.waymode == 'find' and target_distance.length_squared() != 0: # Not there yet, time to move

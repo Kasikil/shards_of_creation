@@ -293,6 +293,14 @@ class Game():
                 mob.health -= projectile.damage
             mob.velocity = vector(0, 0)
         
+        # player hits npc
+        hits = pygame.sprite.spritecollide(self.player, self.npcs, False, collide_hit_rect)
+        if hits:
+            if not hits[0].busy:
+                hits[0].colliding = True
+            else:
+                hits[0].colliding = False
+      
         # player hits portal
         hits = pygame.sprite.spritecollide(self.player, self.portals, False)
         for hit in hits:
@@ -388,6 +396,8 @@ class Game():
         for sprite in self.all_sprites:
             if isinstance(sprite, Mob):
                 sprite.draw_health()
+            if isinstance(sprite, Npc):
+                sprite.draw_talk()
             if self.draw_debug:
                 pygame.draw.rect(self.screen, CYAN, self.map_layer.translate_rect(sprite.hit_rect), 1)
         if self.draw_debug:
