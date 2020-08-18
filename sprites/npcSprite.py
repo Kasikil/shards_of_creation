@@ -15,9 +15,11 @@ try:
     import pygame
     import pytweening
     from random import choice, randint, random, uniform
+    import re
     import sys
 
     # Non-Standard Imports
+    from dialogue_scripts.dialogue import DIALOGUE
     from settings.settings import *
     from settings.npc_settings import *
     from tilemap import collide_hit_rect
@@ -49,6 +51,7 @@ class Npc(pygame.sprite.Sprite):
         self.speed = NPCS[identifier]['speed']
         self.busy = False
         self.dialogue = NPCS[identifier]['dialogue']
+        self.current_dialogue()
 
         # Waypoint System Initialization
         self.waypoint = False
@@ -70,6 +73,16 @@ class Npc(pygame.sprite.Sprite):
                     
     def __repr__(self):
         return '<NPC {} at ({},{})>'.format(self.name, self.position.x, self.position.y)
+
+    def current_dialogue(self, idx=0):
+        if (idx + 1) > len(DIALOGUE[self.dialogue]['next']):
+            return
+        if 'update' in DIALOGUE[self.dialogue]:
+            setattr(self.game.player, DIALOGUE[self.dialogue]['update']['update_field'], DIALOGUE[self.dialogue]['update']['options'][idx])
+        self.dialogue = DIALOGUE[self.dialogue]['next'][idx]
+        self.dialogue_text = DIALOGUE[self.dialogue]['dialogue']
+        self.dialogue_text.replace('[name]', self.game.player.name)
+        self.dialogue_color = DIALOGUE[self.dialogue]['color']
 
     def update(self):
         if self.waypoint and not self.busy:

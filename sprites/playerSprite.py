@@ -52,6 +52,7 @@ class Player(pygame.sprite.Sprite):
         self.last_shot = 0
         self.health = PLAYER_HEALTH
         self.weapon = 'vampirism'
+        self.name = 'Kasikil'
         self.damaged = False
         self.busy = False
         self.conversation_partner = None
@@ -83,10 +84,23 @@ class Player(pygame.sprite.Sprite):
                 self.game.inventory = True
         if self.game.inventory:
             self.get_keys_inventory(keys)
-        if self.busy and keys[pygame.K_x]:
-            self.busy = False
-            self.conversation_partner.busy = False
-            self.conversation_partner = None
+            return
+        if self.busy:
+            if not self.game.wait_for_up:
+                return
+            if keys[pygame.K_x]:
+                self.busy = False
+                self.conversation_partner.busy = False
+                self.conversation_partner = None
+            elif (keys[pygame.K_1] or keys[pygame.K_RETURN]):
+                self.conversation_partner.current_dialogue()
+                self.game.wait_for_up = False
+            elif keys[pygame.K_2]:
+                self.conversation_partner.current_dialogue(1)
+                self.game.wait_for_up = False
+            elif keys[pygame.K_3]:
+                self.conversation_partner.current_dialogue(2)
+                self.game.wait_for_up = False
 
     def get_keys_inventory(self, keys):
         if not self.game.wait_for_up:
