@@ -90,6 +90,8 @@ class Portal(pygame.sprite.Sprite):
             projectile.kill()
         for npc in self.game.npcs:
             npc.kill()
+        for readable in self.game.readables:
+            readable.kill()
 
         # Map Updates
         self.game.switch_map(self.next_map, False)

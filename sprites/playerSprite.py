@@ -56,6 +56,7 @@ class Player(pygame.sprite.Sprite):
         self.damaged = False
         self.busy = False
         self.conversation_partner = None
+        self.reading = None
         self.player_inventory = [Potion(self.game, HIDDEN_ITEM_POSITION, 'health_potion_01', False),
                                  Spell(self.game, HIDDEN_ITEM_POSITION, 'fire_blast_01', False)]
         self.inventory_idx = 0
@@ -82,25 +83,38 @@ class Player(pygame.sprite.Sprite):
                 self.talk()
             if keys[pygame.K_e]:
                 self.game.inventory = True
+            if keys[pygame.K_r]:
+                self.read()
         if self.game.inventory:
             self.get_keys_inventory(keys)
             return
-        if self.busy:
+        if self.busy and self.conversation_partner:
+            self.get_keys_conversation(keys)
+            return
+        if self.busy and self.reading:
             if not self.game.wait_for_up:
                 return
             if keys[pygame.K_x]:
                 self.busy = False
-                self.conversation_partner.busy = False
-                self.conversation_partner = None
-            elif (keys[pygame.K_1] or keys[pygame.K_RETURN]):
-                self.conversation_partner.current_dialogue()
-                self.game.wait_for_up = False
-            elif keys[pygame.K_2]:
-                self.conversation_partner.current_dialogue(1)
-                self.game.wait_for_up = False
-            elif keys[pygame.K_3]:
-                self.conversation_partner.current_dialogue(2)
-                self.game.wait_for_up = False
+                self.reading.busy = False
+                self.reading = None
+
+    def get_keys_conversation(self, keys):
+        if not self.game.wait_for_up:
+            return
+        if keys[pygame.K_x]:
+            self.busy = False
+            self.conversation_partner.busy = False
+            self.conversation_partner = None
+        elif (keys[pygame.K_1] or keys[pygame.K_RETURN]):
+            self.conversation_partner.current_dialogue()
+            self.game.wait_for_up = False
+        elif keys[pygame.K_2]:
+            self.conversation_partner.current_dialogue(1)
+            self.game.wait_for_up = False
+        elif keys[pygame.K_3]:
+            self.conversation_partner.current_dialogue(2)
+            self.game.wait_for_up = False
 
     def get_keys_inventory(self, keys):
         if not self.game.wait_for_up:
@@ -140,6 +154,7 @@ class Player(pygame.sprite.Sprite):
             self.game.wait_for_up = False
 
     def shoot(self):
+        return
         now = pygame.time.get_ticks()
         if now - self.last_shot > WEAPONS[self.weapon]['rate']:
             self.last_shot = now
@@ -162,6 +177,13 @@ class Player(pygame.sprite.Sprite):
             self.busy = True
             self.conversation_partner = hits[0]
             self.conversation_partner.set_init_dialogue()
+    
+    def read(self):
+        hits = pygame.sprite.spritecollide(self, self.game.readables, False, collide_hit_rect)
+        if hits:
+            hits[0].busy = True
+            self.busy = True
+            self.reading = hits[0]
 
     def hit(self):
         self.damaged = True
