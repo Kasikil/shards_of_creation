@@ -19,7 +19,7 @@ try:
     import sys
 
     # Non-Standard Imports
-    from dialogue_scripts.dialogue import DIALOGUE
+    from scripts.dialogue import DIALOGUE
     from settings.settings import *
     from settings.npc_settings import *
     from tilemap import collide_hit_rect

@@ -23,7 +23,7 @@ try:
     import sys
 
     # Non-Standard Imports
-    from dialogue_scripts.dialogue import *
+    from scripts.dialogue import *
     from settings.settings import *
     from settings.map_links import *
     from settings.npc_settings import *
@@ -32,6 +32,7 @@ try:
     from sprites.npcSprite import Npc
     from sprites.obstacleSprite import Obstacle, Portal, Spawn
     from sprites.playerSprite import Player
+    from sprites.readableSprite import Readable
     from tilemap import *
     from utilities import draw_player_health
 except ImportError as err:
@@ -90,7 +91,6 @@ class Game():
         self.load_dim()
         self.load_images()
         self.load_sound()
-        self.load_dialogue()
 
     def load_folders(self):
         self.game_folder = path.dirname(__file__)
@@ -100,7 +100,6 @@ class Game():
         self.npc_img_folder = path.join(self.img_folder, 'npcs')
         self.sound_folder = path.join(self.game_folder, 'sound')
         self.music_folder = path.join(self.game_folder, 'music')
-        self.dialogue = path.join(self.assets_folder, 'dialogue_scripts')
     
     def load_fonts(self):
         self.title_font_file = path.join(self.assets_folder, 'ENDOR.TTF')
@@ -179,9 +178,6 @@ class Game():
         for sound in MOB_HIT_SOUNDS:
             self.mob_hit_sounds.append(pygame.mixer.Sound(path.join(self.sound_folder, sound)))
 
-    def load_dialogue(self):
-        pass
-
     def new(self):
         """
         Initializes all variables and do all the setup for a new game
@@ -194,6 +190,7 @@ class Game():
         self.projectiles = pygame.sprite.Group()
         self.items = pygame.sprite.Group()
         self.npcs = pygame.sprite.Group()
+        self.readables = pygame.sprite.Group()
 
         # Create Boxes Associated With Text Display
         self.dialogue_box = pygame.Rect(DIALOGUE_BOX_X, DIALOGUE_BOX_Y, DIALOGUE_BOX_WIDTH, DIALOGUE_BOX_HEIGHT)
@@ -237,6 +234,9 @@ class Game():
             if tile_object.name == 'spawn':
                 Spawn(self, obj_center.x, obj_center.y, 
                 tile_object.width, tile_object.height, tile_object.type)
+            if tile_object.name == 'readable':
+                Readable(self, obj_center.x, obj_center.y,
+                tile_object.width, tile_object.height, tile_object.type)
             if tile_object.name in POTION_ITEMS:
                 Potion(self, obj_center, tile_object.name)
             if tile_object.name in SPELL_ITEMS:
@@ -248,7 +248,8 @@ class Game():
 
     def run(self):
         self.playing = True
-        pygame.mixer.music.play(loops=-1)
+        # For the moment, this annoys the fuck out of me
+        # pygame.mixer.music.play(loops=-1)
         while self.playing:
             self.dt = self.clock.tick(FPS) / 1000
             self.events()
@@ -266,7 +267,8 @@ class Game():
         """
         Update portion of the game loop
         """
-        self.all_sprites.update()        
+        self.all_sprites.update()
+        self.readables.update()        
         self.all_sprites.center(self.player.rect.center)
         # player hits items
         hits = pygame.sprite.spritecollide(self.player, self.items, False)
@@ -295,6 +297,14 @@ class Game():
         
         # player hits npc
         hits = pygame.sprite.spritecollide(self.player, self.npcs, False, collide_hit_rect)
+        if hits:
+            if not hits[0].busy:
+                hits[0].colliding = True
+            else:
+                hits[0].colliding = False
+
+        # player hits readable
+        hits = pygame.sprite.spritecollide(self.player, self.readables, False, collide_hit_rect)
         if hits:
             if not hits[0].busy:
                 hits[0].colliding = True
@@ -349,13 +359,18 @@ class Game():
     def draw_dialogue_box(self):
         pygame.draw.rect(self.screen, BLACK, self.dialogue_box)
         pygame.draw.rect(self.screen, WHITE, self.dialogue_box, DIALOGUE_BOX_OUTLINE)
+        dialogue_text_y = DIALOGUE_TEXT_Y
         if self.player.busy and self.player.conversation_partner:
-            dialogue_text_y = DIALOGUE_TEXT_Y
             for dialogue_piece in self.player.conversation_partner.dialogue_text:
                 self.draw_wrapped_text(dialogue_piece, self.dialogue_font,
                                        self.player.conversation_partner.dialogue_color, DIALOGUE_TEXT_X, dialogue_text_y, 
                                        DIALOGUE_ALLOWED_WIDTH, DIALOGUE_LINE_SPACING)
                 dialogue_text_y += self.dialogue_font_height
+        if self.player.busy and self.player.reading:
+            self.draw_wrapped_text(self.player.reading.text, self.dialogue_font,
+                                    self.player.reading.color, DIALOGUE_TEXT_X, dialogue_text_y, 
+                                    DIALOGUE_ALLOWED_WIDTH, DIALOGUE_LINE_SPACING)
+            dialogue_text_y += self.dialogue_font_height
 
     def draw_compass(self):
         self.screen.blit(self.compass_img, self.compass_img_rect)
@@ -398,15 +413,18 @@ class Game():
                 sprite.draw_health()
             if isinstance(sprite, Npc):
                 sprite.draw_talk()
-            if self.draw_debug:
-                pygame.draw.rect(self.screen, CYAN, self.map_layer.translate_rect(sprite.hit_rect), 1)
+        for sprite in self.readables:
+                sprite.draw_read()
         if self.draw_debug:
+            pygame.draw.rect(self.screen, CYAN, self.map_layer.translate_rect(self.player.hit_rect), 1)
             for wall in self.walls:
                 pygame.draw.rect(self.screen, CYAN, self.map_layer.translate_rect(wall.rect), 1)
             for portal in self.portals:
                 pygame.draw.rect(self.screen, RED, self.map_layer.translate_rect(portal.rect), 1)
             for spawn in self.spawns:
                 pygame.draw.rect(self.screen, YELLOW, self.map_layer.translate_rect(spawn.rect), 1)
+            for readable in self.readables:
+                pygame.draw.rect(self.screen, GREEN, self.map_layer.translate_rect(readable.rect), 1)
 
         # pygame.draw.rect(self.screen, WHITE, self.player.hit_rect, 2)
         if self.night:

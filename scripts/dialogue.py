@@ -1,7 +1,7 @@
 ####################################################################
 #
 #
-# Shards of Creation -- assets.dialogue_scripts.dialogue --
+# Shards of Creation -- scripts.dialogue --
 # A Fantasy Narrative RPG
 # Liscense Here
 #
