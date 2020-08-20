@@ -35,7 +35,7 @@ class Readable(pygame.sprite.Sprite):
         self.x = x
         self.y = y
         self.rect.center = (x, y)
-        self.text = READABLE[key]['text']
+        self.text = READABLE[key]['text'].split('\n')
         self.name = READABLE[key]['title']
         self.color = READABLE[key]['color']
         self.colliding = False

@@ -367,10 +367,11 @@ class Game():
                                        DIALOGUE_ALLOWED_WIDTH, DIALOGUE_LINE_SPACING)
                 dialogue_text_y += self.dialogue_font_height
         if self.player.busy and self.player.reading:
-            self.draw_wrapped_text(self.player.reading.text, self.dialogue_font,
-                                    self.player.reading.color, DIALOGUE_TEXT_X, dialogue_text_y, 
-                                    DIALOGUE_ALLOWED_WIDTH, DIALOGUE_LINE_SPACING)
-            dialogue_text_y += self.dialogue_font_height
+            for text_piece in self.player.reading.text:
+                self.draw_wrapped_text(text_piece, self.dialogue_font,
+                                        self.player.reading.color, DIALOGUE_TEXT_X, dialogue_text_y, 
+                                        DIALOGUE_ALLOWED_WIDTH, DIALOGUE_LINE_SPACING)
+                dialogue_text_y += self.dialogue_font_height
 
     def draw_compass(self):
         self.screen.blit(self.compass_img, self.compass_img_rect)

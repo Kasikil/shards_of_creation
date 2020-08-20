@@ -21,11 +21,11 @@ except ImportError as err:
 
 READABLE = {}
 # READABLE[] = {'title': '', 'text': '', 'audio': '', 'color': '', 'read': False}
-READABLE['monestary_floor_etching'] = {'title': 'Floor Plaque', 'text': 'Peace only has meaning in community', 'audio': '', 'color': WHITE, 'read': False}
-READABLE['grave_0000'] = {'title': 'Grave', 'text': 'RIP Brother Albard, Master of Bees', 'audio': '', 'color': WHITE, 'read': False}
-READABLE['grave_0001'] = {'title': 'Grave', 'text': 'RIP Brother Donaldson, Friend of Nature', 'audio': '', 'color': WHITE, 'read': False}
-READABLE['grave_0002'] = {'title': 'Grave', 'text': 'RIP Brother Antilles, Lover of Poetry', 'audio': '', 'color': WHITE, 'read': False}
-READABLE['grave_0003'] = {'title': 'Grave', 'text': 'RIP Sister Sensara, Brewer of Ales', 'audio': '', 'color': WHITE, 'read': False}
+READABLE['monestary_floor_etching'] = {'title': 'Floor Plaque', 'text': 'Peace only\nhas meaning\nin community', 'audio': '', 'color': WHITE, 'read': False}
+READABLE['grave_0000'] = {'title': 'Grave', 'text': 'RIP Brother Albard\nMaster of Bees\n2507-2573', 'audio': '', 'color': WHITE, 'read': False}
+READABLE['grave_0001'] = {'title': 'Grave', 'text': 'RIP Brother Donaldson\nFriend of Nature\n2499-2581', 'audio': '', 'color': WHITE, 'read': False}
+READABLE['grave_0002'] = {'title': 'Grave', 'text': 'RIP Brother Antilles\nLover of Poetry\n2481-2576', 'audio': '', 'color': WHITE, 'read': False}
+READABLE['grave_0003'] = {'title': 'Grave', 'text': 'RIP Sister Sensara\nBrewer of Ales\n2505-2589', 'audio': '', 'color': WHITE, 'read': False}
 READABLE['grave_0004'] = {'title': 'Grave', 'text': 'RIP ', 'audio': '', 'color': WHITE, 'read': False}
 READABLE['grave_0005'] = {'title': 'Grave', 'text': 'RIP ', 'audio': '', 'color': WHITE, 'read': False}
 READABLE['grave_0006'] = {'title': 'Grave', 'text': 'RIP ', 'audio': '', 'color': WHITE, 'read': False}
