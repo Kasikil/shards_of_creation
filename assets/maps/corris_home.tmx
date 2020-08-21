@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.4" tiledversion="1.4.1" orientation="orthogonal" renderorder="right-down" width="11" height="6" tilewidth="32" tileheight="32" infinite="0" nextlayerid="4" nextobjectid="15">
+ <tileset firstgid="1" source="ShardsOfCreation.tsx"/>
+ <layer id="1" name="Layer0" width="11" height="6">
+  <data encoding="csv">
+6,36,4,4,6,35,13,35,35,6,5,
+34,13,13,13,13,13,13,13,13,13,6,
+6,13,13,13,13,13,13,13,13,13,5,
+35,13,13,13,13,13,13,13,13,13,6,
+35,13,13,13,13,13,13,13,13,13,4,
+6,4,5,34,4,36,6,35,4,5,5
+</data>
+ </layer>
+ <layer id="2" name="Layer1" width="11" height="6">
+  <data encoding="csv">
+0,0,0,0,0,0,92,0,0,0,0,
+0,121,93,0,0,0,0,0,0,91,0,
+0,0,123,0,0,0,0,0,0,0,0,
+0,0,0,0,0,91,122,91,0,0,0,
+0,0,0,0,0,0,91,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0
+</data>
+ </layer>
+ <objectgroup id="3" name="All">
+  <object id="1" name="wall" x="32" y="32" width="32" height="32"/>
+  <object id="2" name="wall" x="64" y="32" width="32" height="64"/>
+  <object id="3" name="spawn" type="front_door" x="192" y="32" width="32" height="32"/>
+  <object id="4" name="portal" type="front_door" x="192" y="8" width="32" height="8"/>
+  <object id="5" name="wall" x="192" y="96" width="32" height="32"/>
+  <object id="6" name="wall" x="296" y="40" width="16" height="16"/>
+  <object id="7" name="wall" x="168" y="104" width="16" height="16"/>
+  <object id="8" name="wall" x="232" y="104" width="16" height="16"/>
+  <object id="9" name="wall" x="200" y="136" width="16" height="16"/>
+  <object id="10" name="wall" x="0" y="0" width="192" height="32"/>
+  <object id="11" name="wall" x="224" y="0" width="128" height="32"/>
+  <object id="12" name="wall" x="0" y="160" width="352" height="32"/>
+  <object id="13" name="wall" x="0" y="32" width="32" height="128"/>
+  <object id="14" name="wall" x="320" y="32" width="32" height="128"/>
+ </objectgroup>
+</map>

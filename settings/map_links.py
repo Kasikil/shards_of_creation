@@ -32,8 +32,28 @@ MAP_PORTALS = {
         'front_door': Link('world_000001', 'monestary_front_door'),
         'garden_door': Link('world_000001', 'monestary_garden_door')
     },
+    'tinterbeck_home': {
+        'front_door': Link('world_000001', 'taize_village_tinterbeck_home')
+    },
+    'sovik_home': {
+        'front_door': Link('world_000001', 'taize_village_sovik_home')
+    },
+    'corris_home': {
+        'front_door': Link('world_000001', 'taize_village_corris_home')
+    },
+    'elsk_home': {
+        'front_door': Link('world_000001', 'taize_village_elsk_home')
+    },
+    'morad_home': {
+        'front_door': Link('world_000001', 'taize_village_morad_home')
+    },
     'world_000001': {
         'monestary_front_door': Link('monestary', 'front_door'),
-        'monestary_garden_door': Link('monestary', 'garden_door')
+        'monestary_garden_door': Link('monestary', 'garden_door'),
+        'taize_village_tinterbeck_home': Link('tinterbeck_home', 'front_door'),
+        'taize_village_sovik_home': Link('sovik_home', 'front_door'),
+        'taize_village_corris_home': Link('corris_home', 'front_door'),
+        'taize_village_elsk_home': Link('elsk_home', 'front_door'),
+        'taize_village_morad_home': Link('morad_home', 'front_door')
     }
 }
