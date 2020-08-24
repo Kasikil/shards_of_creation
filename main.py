@@ -407,6 +407,8 @@ class Game():
         if DEBUG:
             pygame.display.set_caption("{:.2f}".format(self.clock.get_fps()))
         # self.screen.fill(BGCOLOR)
+        for sprite in self.mobs:
+            sprite.draw_health()
         self.all_sprites.draw(self.screen)
         # self.draw_grid()
         for sprite in self.all_sprites:
@@ -418,6 +420,10 @@ class Game():
                 sprite.draw_read()
         if self.draw_debug:
             pygame.draw.rect(self.screen, CYAN, self.map_layer.translate_rect(self.player.hit_rect), 1)
+            for mob in self.mobs:
+                pygame.draw.rect(self.screen, CYAN, self.map_layer.translate_rect(mob.hit_rect), 1)
+            for projectile in self.projectiles:
+                pygame.draw.rect(self.screen, CYAN, self.map_layer.translate_rect(projectile.hit_rect), 1)
             for wall in self.walls:
                 pygame.draw.rect(self.screen, CYAN, self.map_layer.translate_rect(wall.rect), 1)
             for portal in self.portals:
