@@ -39,7 +39,7 @@ NPCS['Corris'] = {'name': 'Corris',
                 'waysleep': [25, 50, 17, 23], # in seconds
                 'dialogue': 100}
 NPCS['Elsk'] = {'name': 'Elsk',
-                'image': 'villager001.png',
+                'image': 'villager002.png',
                 'hit_rect': pygame.Rect(0, 0, 30, 30),
                 'health': 500,
                 'movement_method': 'waypoint',
@@ -49,7 +49,7 @@ NPCS['Elsk'] = {'name': 'Elsk',
                 'waysleep': [7], # in seconds
                 'dialogue': 200}
 NPCS['Morad'] = {'name': 'Morad',
-                'image': 'villager001.png',
+                'image': 'villager003.png',
                 'hit_rect': pygame.Rect(0, 0, 30, 30),
                 'health': 500,
                 'movement_method': 'waypoint',
@@ -98,3 +98,5 @@ NPCS['Goat'] = {'name': 'Goat',
                 'waypoints': [[0, 0], [-128, 0], [-128, 128], [0, 128]], # in pixels
                 'waysleep': [15], # in seconds
                 'dialogue': 700}
+
+RANDOM_NPC_LIST = ['Goat', 'Goat', 'Goat', 'Goat', 'Goat']

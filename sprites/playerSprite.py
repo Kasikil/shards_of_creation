@@ -78,7 +78,7 @@ class Player(pygame.sprite.Sprite):
             if keys[pygame.K_DOWN] or keys[pygame.K_s]:
                 self.velocity = vector(-PLAYER_SPEED / 2, 0).rotate(-self.rotation)
             if keys[pygame.K_SPACE]:
-                self.shoot()
+                self.cast()
             if keys[pygame.K_t]:
                 self.talk()
             if keys[pygame.K_e]:
@@ -153,7 +153,7 @@ class Player(pygame.sprite.Sprite):
             self.game.inventory = False
             self.game.wait_for_up = False
 
-    def shoot(self):
+    def cast(self):
         now = pygame.time.get_ticks()
         if now - self.last_shot > WEAPONS[self.weapon]['rate']:
             self.last_shot = now
