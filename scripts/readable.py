@@ -21,6 +21,7 @@ except ImportError as err:
 
 READABLE = {}
 # READABLE[] = {'title': '', 'text': '', 'audio': '', 'color': '', 'read': False}
+# Monestary and Graveyard
 # Row 1
 READABLE['monestary_floor_etching'] = {'title': 'Floor Plaque', 'text': 'Peace only\nhas meaning\nin community', 'audio': '', 'color': WHITE, 'read': False}
 READABLE['grave_0000'] = {'title': 'Grave', 'text': 'RIP Brother Adriel\nMaster of Bees\n2507-2573', 'audio': '', 'color': WHITE, 'read': False}
@@ -78,3 +79,11 @@ READABLE['grave_0046'] = {'title': 'Grave', 'text': 'RIP Sister Anna\nWelcomer o
 READABLE['grave_0047'] = {'title': 'Grave', 'text': 'RIP Sister Claudia\nFriend of Wild Things\n2446-2531', 'audio': '', 'color': WHITE, 'read': False}
 # Head
 READABLE['grave_0048'] = {'title': 'Grave', 'text': 'RIP Sister Eve\n Layer of the Foundation\n2432-2512', 'audio': '', 'color': WHITE, 'read': False}
+
+# Taize Village
+READABLE['taize_welcome'] = {'title': 'Welcome Sign', 'text': 'Welcome to Taize Village!', 'audio': '', 'color': WHITE, 'read': False}
+READABLE['corris_sign'] = {'title': 'House Sign', 'text': 'Corris and Dalin\nLove is a Lily', 'audio': '', 'color': WHITE, 'read': False}
+READABLE['elsk_sign'] = {'title': 'House Sign', 'text': 'Elsk Home\nKindness And Love', 'audio': '', 'color': WHITE, 'read': False}
+READABLE['morad_sign'] = {'title': 'House Sign', 'text': 'Morad\'s Dwelling\nSimple Pleasures', 'audio': '', 'color': WHITE, 'read': False}
+READABLE['sovik_sign'] = {'title': 'House Sign', 'text': 'Sovik\nThe Way of Silence', 'audio': '', 'color': WHITE, 'read': False}
+READABLE['tinterbeck_sign'] = {'title': 'House Sign', 'text': 'Tinterbeck Home\nCome Share Some Tea', 'audio': '', 'color': WHITE, 'read': False}

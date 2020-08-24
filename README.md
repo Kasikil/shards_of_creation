@@ -46,7 +46,7 @@ General Controls:
 * n           - Night mode
 * e           - Open Inventory
 * t           - Talk
-* Space       - Fire Spell
+* r           - Read
 
 Movement Controls:
 * a           - Rotate Left
@@ -69,3 +69,8 @@ Inventory Controls:
 
 Conversation Controls:
 * x           - Exit Conversation
+* 1, 2, 3     - Select Conversation Option
+* Enter       - Select First Conversation Option or Advance to Next Dialogue
+
+Reading Controls:
+* x           - Exit Reading
