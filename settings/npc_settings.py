@@ -29,7 +29,7 @@ NPCS['Zuan'] = {'name': 'Zuan',
                 'waysleep': [15], # in seconds
                 'dialogue': 0}
 NPCS['Corris'] = {'name': 'Corris',
-                'image': 'Zuan.png',
+                'image': 'villager001.png',
                 'hit_rect': pygame.Rect(0, 0, 30, 30),
                 'health': 500,
                 'movement_method': 'waypoint',
@@ -39,7 +39,7 @@ NPCS['Corris'] = {'name': 'Corris',
                 'waysleep': [25, 50, 17, 23], # in seconds
                 'dialogue': 100}
 NPCS['Elsk'] = {'name': 'Elsk',
-                'image': 'Zuan.png',
+                'image': 'villager001.png',
                 'hit_rect': pygame.Rect(0, 0, 30, 30),
                 'health': 500,
                 'movement_method': 'waypoint',
@@ -49,7 +49,7 @@ NPCS['Elsk'] = {'name': 'Elsk',
                 'waysleep': [7], # in seconds
                 'dialogue': 200}
 NPCS['Morad'] = {'name': 'Morad',
-                'image': 'Zuan.png',
+                'image': 'villager001.png',
                 'hit_rect': pygame.Rect(0, 0, 30, 30),
                 'health': 500,
                 'movement_method': 'waypoint',
@@ -58,8 +58,18 @@ NPCS['Morad'] = {'name': 'Morad',
                 'waypoints': [[0, -32], [0, 0]], # in pixels
                 'waysleep': [2], # in seconds
                 'dialogue': 300}
+NPCS['Sovik'] = {'name': 'Sovik',
+                'image': 'villager001.png',
+                'hit_rect': pygame.Rect(0, 0, 30, 30),
+                'health': 500,
+                'movement_method': 'waypoint',
+                'speed': 100,
+                'waypoint_system': 'relative', # relative or absolute
+                'waypoints': [[0, -32], [0, 0]], # in pixels
+                'waysleep': [2], # in seconds
+                'dialogue': 400}
 NPCS['Tinterbeck'] = {'name': 'Tinterbeck',
-                'image': 'Zuan.png',
+                'image': 'villager001.png',
                 'hit_rect': pygame.Rect(0, 0, 30, 30),
                 'health': 500,
                 'movement_method': 'waypoint',
@@ -69,7 +79,7 @@ NPCS['Tinterbeck'] = {'name': 'Tinterbeck',
                 'waysleep': [8], # in seconds
                 'dialogue': 500}
 NPCS['Sivas'] = {'name': 'Sivas',
-                'image': 'Zuan.png',
+                'image': 'villager001.png',
                 'hit_rect': pygame.Rect(0, 0, 30, 30),
                 'health': 500,
                 'movement_method': 'waypoint',

@@ -154,7 +154,6 @@ class Player(pygame.sprite.Sprite):
             self.game.wait_for_up = False
 
     def shoot(self):
-        return
         now = pygame.time.get_ticks()
         if now - self.last_shot > WEAPONS[self.weapon]['rate']:
             self.last_shot = now
