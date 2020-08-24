@@ -102,6 +102,6 @@ class Mob(pygame.sprite.Sprite):
         if self.preset_npc:
             Npc(self.game, self.hit_rect.centerx, self.hit_rect.centery, self.preset_npc)
         else:
-            npc_key = randint(0, len(RANDOM_NPC_LIST))
+            npc_key = randint(0, len(RANDOM_NPC_LIST) - 1)
             Npc(self.game, self.hit_rect.centerx, self.hit_rect.centery, RANDOM_NPC_LIST[npc_key])
         self.kill()
