@@ -98,3 +98,5 @@ NPCS['Goat'] = {'name': 'Goat',
                 'waypoints': [[0, 0], [-128, 0], [-128, 128], [0, 128]], # in pixels
                 'waysleep': [15], # in seconds
                 'dialogue': 700}
+
+RANDOM_NPC_LIST = ['Goat', 'Goat', 'Goat', 'Goat', 'Goat']

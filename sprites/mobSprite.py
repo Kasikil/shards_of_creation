@@ -19,7 +19,8 @@ try:
 
     # Non-Standard Imports
     from settings.settings import *
-    from settings.npc_settings import *
+    from settings.npc_settings import RANDOM_NPC_LIST
+    from sprites.npcSprite import Npc
     from tilemap import collide_hit_rect
     from utilities import collide_with_walls
 except ImportError as err:
@@ -30,7 +31,7 @@ vector = pygame.math.Vector2
 
 
 class Mob(pygame.sprite.Sprite):
-    def __init__(self, game, x, y):
+    def __init__(self, game, x, y, preset_npc=None):
         self._layer = MOB_LAYER
         self.groups = game.all_sprites, game.mobs
         pygame.sprite.Sprite.__init__(self, self.groups)
@@ -48,6 +49,7 @@ class Mob(pygame.sprite.Sprite):
         self.health = MOB_HEALTH
         self.speed = choice(MOB_SPEEDS)
         self.target = game.player
+        self.preset_npc = preset_npc
 
     def __repr__(self):
         return '<Mob Position {}>'.format(self.position)
@@ -80,18 +82,26 @@ class Mob(pygame.sprite.Sprite):
         self.image = pygame.transform.rotate(self.game.mob_img, self.rotation)
         self.rect.center = self.position
         if self.health <= 0:
-            choice(self.game.mob_hit_sounds).play()
-            self.kill()
-            self.game.map_img.blit(self.game.splat, self.position - vector(TILESIZE / 2, TILESIZE / 2))
+            self.corruption_cured()
 
     def draw_health(self):
         if self.health > MOB_HEALTH * 0.6:
-            color = GREEN
+            color = RED
         elif self.health > MOB_HEALTH * 0.3:
             color = YELLOW
         else:
-            color = RED
+            color = GREEN
         width = int(self.rect.width * self.health / MOB_HEALTH)
         self.health_bar = pygame.Rect(0, 0, width, 3)
         if self.health < MOB_HEALTH:
             pygame.draw.rect(self.image, color, self.health_bar)
+    
+    def corruption_cured(self):
+        choice(self.game.mob_hit_sounds).play()
+        # Spawn NPC cured of corruption
+        if self.preset_npc:
+            Npc(self.game, self.hit_rect.centerx, self.hit_rect.centery, self.preset_npc)
+        else:
+            npc_key = randint(0, len(RANDOM_NPC_LIST))
+            Npc(self.game, self.hit_rect.centerx, self.hit_rect.centery, RANDOM_NPC_LIST[npc_key])
+        self.kill()

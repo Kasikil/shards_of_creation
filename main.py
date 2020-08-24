@@ -222,7 +222,7 @@ class Game():
             elif not spawn:
                 self.all_sprites.add(self.player)
             if tile_object.name == 'mob':
-                Mob(self, obj_center.x, obj_center.y)
+                Mob(self, obj_center.x, obj_center.y, tile_object.type)
             if tile_object.name == 'npc':
                 Npc(self, obj_center.x, obj_center.y, tile_object.type)
             if tile_object.name == 'wall':
@@ -408,30 +408,29 @@ class Game():
             pygame.display.set_caption("{:.2f}".format(self.clock.get_fps()))
         # self.screen.fill(BGCOLOR)
         for sprite in self.mobs:
+            # Must be drawn before blitting image onto the screen
             sprite.draw_health()
         self.all_sprites.draw(self.screen)
-        # self.draw_grid()
-        for sprite in self.all_sprites:
-            if isinstance(sprite, Mob):
-                sprite.draw_health()
-            if isinstance(sprite, Npc):
-                sprite.draw_talk()
+        # self.draw_grid()                
         for sprite in self.readables:
-                sprite.draw_read()
-        if self.draw_debug:
-            pygame.draw.rect(self.screen, CYAN, self.map_layer.translate_rect(self.player.hit_rect), 1)
-            for mob in self.mobs:
-                pygame.draw.rect(self.screen, CYAN, self.map_layer.translate_rect(mob.hit_rect), 1)
-            for projectile in self.projectiles:
-                pygame.draw.rect(self.screen, CYAN, self.map_layer.translate_rect(projectile.hit_rect), 1)
-            for wall in self.walls:
-                pygame.draw.rect(self.screen, CYAN, self.map_layer.translate_rect(wall.rect), 1)
-            for portal in self.portals:
-                pygame.draw.rect(self.screen, RED, self.map_layer.translate_rect(portal.rect), 1)
-            for spawn in self.spawns:
-                pygame.draw.rect(self.screen, YELLOW, self.map_layer.translate_rect(spawn.rect), 1)
-            for readable in self.readables:
-                pygame.draw.rect(self.screen, GREEN, self.map_layer.translate_rect(readable.rect), 1)
+            sprite.draw_read()
+        
+        if self.draw_debug: pygame.draw.rect(self.screen, CYAN, self.map_layer.translate_rect(self.player.hit_rect), 1)
+        for mob in self.mobs:
+            if self.draw_debug: pygame.draw.rect(self.screen, CYAN, self.map_layer.translate_rect(mob.hit_rect), 1)
+        for npc in self.npcs:
+            if self.draw_debug: pygame.draw.rect(self.screen, CYAN, self.map_layer.translate_rect(npc.hit_rect), 1)
+            npc.draw_talk()
+        for projectile in self.projectiles:
+            if self.draw_debug: pygame.draw.rect(self.screen, CYAN, self.map_layer.translate_rect(projectile.hit_rect), 1)
+        for wall in self.walls:
+            if self.draw_debug: pygame.draw.rect(self.screen, CYAN, self.map_layer.translate_rect(wall.rect), 1)
+        for portal in self.portals:
+            if self.draw_debug: pygame.draw.rect(self.screen, RED, self.map_layer.translate_rect(portal.rect), 1)
+        for spawn in self.spawns:
+            if self.draw_debug: pygame.draw.rect(self.screen, YELLOW, self.map_layer.translate_rect(spawn.rect), 1)
+        for readable in self.readables:
+            if self.draw_debug: pygame.draw.rect(self.screen, GREEN, self.map_layer.translate_rect(readable.rect), 1)
 
         # pygame.draw.rect(self.screen, WHITE, self.player.hit_rect, 2)
         if self.night:
