@@ -74,3 +74,24 @@ Conversation Controls:
 
 Reading Controls:
 * x           - Exit Reading
+
+## Things to Check for Functionality
+
+Pause Screen
+Debug - Outlines
+Night Mode
+Inventory
+Inventory: Use Item
+Inventory: Drop Item
+Inventory: Scroll Through Items
+Movement Controls - Rotation and Movement
+Casting Spells
+Talking to NPCs
+Reading Items
+Collisions with Walls
+Collisions with Mobs
+Healing Mob of Corruption
+Becoming Corrupted by a Mob
+Traveling through Portals
+Picking Items Up
+(Continue with New Functionality as Added)
